@@ -1,52 +1,61 @@
+🕵️‍♂️ Writeups de CTF
+________________________________________________________________________________________________________________________________________________________________
+✨ Bienvenido
 
-🕵️ Writeups CTF
+¡Hola! Este repositorio contiene mis writeups de Capture The Flag (CTF).
+Aquí documentaré los retos que vaya resolviendo en distintas competiciones y plataformas de ciberseguridad.
 
-Bienvenido a mi repositorio de Writeups de CTF.
-Aquí recopilo las soluciones, apuntes y explicaciones de distintos Capture The Flag en los que participo o practico.
+Mi objetivo es compartir conocimientos, mostrar mi proceso de razonamiento y crear un espacio de aprendizaje para otros entusiastas de la seguridad informática.
+________________________________________________________________________________________________________________________________________________________________
+🎯 Objetivos del repositorio
 
-🎯 Objetivo
+Documentar soluciones completas de cada reto.
 
-Este repositorio tiene como finalidad:
+Mejorar mis habilidades en áreas como:
 
-Documentar mi aprendizaje en ciberseguridad y hacking ético.
+Web 🌐
 
-Compartir metodologías y técnicas utilizadas en retos de CTF.
+Criptografía 🔑
 
-Servir como material de consulta tanto para mí como para otras personas interesadas en el tema.
+Forense 🧩
 
-📂 Contenido
+Explotación de binarios / Pwn 💣
 
-Los writeups estarán organizados por categorías o plataformas, por ejemplo:
+Misc / Otros retos 📦
 
-Pwn / Exploiting
+Crear un recurso educativo y de referencia para la comunidad.
+________________________________________________________________________________________________________________________________________________________________
 
-Web
+📂 Estructura
 
-Forensics
+Cada writeup estará organizado por plataforma o evento, y dentro se clasificará según la categoría:
 
-Crypto
+```
+/Plataforma-o-Evento/
+ ├── Web/
+ ├── Crypto/
+ ├── Forensics/
+ ├── Pwn/
+ └── Misc/
+```
 
-OSINT
+Esto facilita navegar y encontrar retos según su tipo y dificultad.
+________________________________________________________________________________________________________________________________________________________________
 
-Misc
+⚠️ Aviso
 
-Cada carpeta contendrá:
+Estos writeups tienen fines educativos y deben usarse únicamente en entornos legales como laboratorios, competiciones y plataformas de CTF.
+❌ No deben emplearse para actividades ilícitas.
+________________________________________________________________________________________________________________________________________________________________
 
-El writeup en formato Markdown.
+🚀 Próximos pasos
 
-Archivos o scripts de apoyo cuando sean necesarios.
+Iré subiendo progresivamente writeups de diferentes retos, mostrando explicaciones paso a paso, capturas, scripts y métodos utilizados.
 
-⚠️ Disclaimer
+💬 Comentarios, sugerencias y aportes son más que bienvenidos para mejorar este repositorio.
+________________________________________________________________________________________________________________________________________________________________
+🔗 Conecta conmigo
 
-Todo el contenido publicado en este repositorio tiene un fin educativo y de documentación personal.
-No me hago responsable del mal uso que se pueda dar a la información aquí compartida.
+Si quieres seguir mi trabajo, ver más proyectos o contactarme, puedes encontrarme en LinkedIn:
 
-🤝 Contribuciones
-
-Si quieres aportar correcciones, mejoras o discutir una técnica diferente, eres bienvenido a abrir un pull request o issue.
-
-📬 Contacto
-
-GitHub: [Tu usuario]
-
-LinkedIn / Twitter / Correo (opcional)
+💡 https://www.linkedin.com/in/javiermartinmartin97/
