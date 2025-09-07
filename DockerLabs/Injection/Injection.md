@@ -9,9 +9,9 @@
 2. En mi caso, yo me creo un directorio con el nombre de la máquina para tenerlo todo más organizado, por lo que mediante el comando mv (`mv ~/Downloads/<máquina.zip> ~/Desktop/Máquinas/Dockerlabs/<máquina>`) la moveré de descargas a la nueva ubicación.
 3. Una vez hecho esto, la descomprimiremos mediante unzip <máquina.zip> y se nos creará un ejecutable .tar
 4. Por último, la desplegaremos mediante sudo bash auto_deploy.sh <máquina.tar> y se nos proporcionará una IP, en mi caso 172.17.0.2.
-## RESOLUCIÓN
+## EXPLOTACIÓN Y ESCALADA DE PRIVILEGIOS
 Primero comprobaremos la conectividad con la máquina. 
-```bash
+```ruby
 > ping -c1 172.17.0.2
 PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
 64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=4.45 ms
@@ -28,7 +28,7 @@ rtt min/avg/max/mdev = 4.447/4.447/4.447/0.000 ms
   * Tenemos un ttl = 64, lo que quiere decir que nos encontramos ante un sistema Linux.
 
 Una vez visto que tenemos conectividad comenzaremos con el escaneo de puertos.  Para ello ejecutaremos:
-```bash
+```ruby
 ❯ nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 172.17.0.2 -oG allPorts
 ```
 * Con -p- escaneamos el rango completo de puertos (65535).
@@ -46,7 +46,7 @@ Una vez visto que tenemos conectividad comenzaremos con el escaneo de puertos.  
 * Por último, con -oG exportamos la evidencia en un archivo con formato grepeable para facilitar su procesamiento en auditorias.
 
 Para simplificarnos el visionado de los puertos abiertos directamente abriremos el archivo *allPorts*.
-```bash
+```ruby
 ❯ cat allPorts
 ───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: allPorts
@@ -105,7 +105,7 @@ Tras acceder a la web nos encontramos con un panel de login en el cual probaremo
 1. Probar con una inyección SQL.
 2. Hacer uso de la herramienta SQLmap
 
-### Inyección SQL
+### 1. Inyección SQL
 En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona y nos dirige a la página "172.17.0.2/acceso_valido_dylan.php" con un mensaje con lo que parece un usuario y una contraseña.
 ![Verificación del login](https://github.com/JavieRR13/WriteUps/blob/7822d55fd459467c092cd53b1ffe3725a01209cd/DockerLabs/Injection/Im%C3%A1genes/Injection_VerificacionLogin.png)
 ![Usuario y contraseña](https://github.com/JavieRR13/WriteUps/blob/489a64f2311f3532d2e8038ab675cf76a087ad30/DockerLabs/Injection/Im%C3%A1genes/Injection_Contrase%C3%B1a_Usuario.png)
@@ -123,7 +123,7 @@ SELECT * FROM usuarios WHERE usuario = '' or 1=1 --' AND contraseña = 'contrase
 * -- convierte el resto de la línea en un comentario, por lo que la verificación de contraseña se ignora totalmente.
 
 Con esta información vamos a intentar logaearnos en el servicio SSH y ver si conseguimos acceso a un posible usuario *Dylan*.
-```
+```C
 ❯ ssh dylan@172.17.0.2
 dylan@172.17.0.2's password: 
 Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 6.12.38+kali-amd64 x86_64)
@@ -147,3 +147,46 @@ applicable law.
 dylan@127ef1d0b8b9:~$ whoami
 dylan
 ```
+Como era de esperar, estamos dentro del servicio SSH con el usuario *Dylan*.  
+
+Para continuar, vamos a intentar listar todos los privilegios de *sudo* del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo.
+```ruby
+dylan@127ef1d0b8b9:~$ sudo -l
+-bash: sudo: command not found
+```
+Vemos que nos ha devuelto que el comando *sudo* no se ha encontrado así que no listaremos permisos de sudoers.  Esto puede ser por:
+* El sistema está minimalista (por ejemplo, contenedores, sistemas de pruebas, o ciertos servidores SSH).
+* Tu usuario no tiene permisos para sudo, o sudo no está instalado.
+
+La siguiente opción es buscar permisos SUID.  El SUID (Set User ID) es un bit especial de permisos en sistemas tipo Unix/Linux que se aplica a archivos ejecutables. Su función principal es permitir que un programa se ejecute con los permisos del propietario del archivo, en lugar de los permisos del usuario que lo ejecuta. Esto puede ser útil para ciertas tareas que requieren privilegios elevados, sin dar acceso completo al usuario.  Para ello ejecutaremos: 
+```ruby 
+dylan@127ef1d0b8b9:~$ find / -type f -perm -4000 2>/dev/null 
+```
+* Con find buscamos archivos y directorios en Linux.
+* Con / indicamos desde la raíz del sistema (es decir, busca en todo el sistema de archivos).
+* Con -type filtramos el tipo de archivo que queremos encontrar.
+* f significa *file* (archivo regular).
+* Con -perm filtramos por permisos específicos.
+* El bit 4000 corresponde al bit SUID:
+  * 4000 indica “ejecutar con los permisos del propietario”.
+  * El - antes de 4000 significa que cualquier archivo que tenga este bit SUID activado será incluido, aunque tenga otros permisos también.
+* Con 2>/dev/null conseguimos que la salida solo muestre los archivos válidos y no los errores.
+  * 2 es el descriptor de error (stderr).
+  * /dev/null es un archivo especial en Linux que descarta todo lo que se escriba en él.
+
+Una vez lo hemos ejecutado nos encontramos frente a la siguiente salida:
+```ruby
+dylan@127ef1d0b8b9:~$ find / -type f -perm -4000 2>/dev/null 
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/bin/chsh
+/usr/bin/su
+/usr/bin/env
+/usr/bin/gpasswd
+/usr/bin/umount
+/usr/bin/newgrp
+/usr/bin/chfn
+/usr/bin/mount
+/usr/bin/passwd
+```
+De todos estos archivos el más explotable es ``/usr/bin/env puesto que con env podemos ejecutar un programa con un entorno modificado.  Para encontrar alguna vulnerabilidad en este binario ejecutable podemos dirigirnos a GTFOBins (https://gtfobins.github.io/gtfobins/env/#shell)
