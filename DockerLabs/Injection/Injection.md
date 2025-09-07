@@ -1,5 +1,5 @@
 # INJECTION
-### INDICACIONES PREVIAS
+## INDICACIONES PREVIAS
 * Sistema operativo: Kali Linux
 * Terminal: ZSH Powerlevel10K
 * Utilidad mkt definida en la zshrc para la creación automática de directorios nmap, content y scripts.
@@ -9,7 +9,7 @@
 2. En mi caso, yo me creo un directorio con el nombre de la máquina para tenerlo todo más organizado, por lo que mediante el comando mv (`mv ~/Downloads/<máquina.zip> ~/Desktop/Máquinas/Dockerlabs/<máquina>`) la moveré de descargas a la nueva ubicación.
 3. Una vez hecho esto, la descomprimiremos mediante unzip <máquina.zip> y se nos creará un ejecutable .tar
 4. Por último, la desplegaremos mediante sudo bash auto_deploy.sh <máquina.tar> y se nos proporcionará una IP, en mi caso 172.17.0.2.
-### WRITEUP
+## RESOLUCIÓN
 Primero comprobaremos la conectividad con la máquina. 
 ```
 > ping -c1 172.17.0.2
@@ -96,4 +96,12 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ```
 En el puerto 22 nos encontramos con un servicio OpenSSH actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
 
-![Panel de Login](DockerLabs/Injection/Imágenes/Injection_PanelLogin.png)
+![Panel de Login](https://github.com/JavieRR13/WriteUps/blob/9b5fe63cc7ac5bb28d3908e2bde8db8f0f18ac69/DockerLabs/Injection/Im%C3%A1genes/Injection_PanelLogin.png)
+
+Tras acceder a la web nos encontramos con un panel de login en el cual probaremos a usar el clásico user: admin/password: admin que, como era lógico, no iba a funcionar. Ahora tenemos dos opciones:
+1. Probar con una inyección SQL.
+2. Hacer uso de la herramienta SQLmap
+
+### Inyección SQL
+En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona.
+![Verificación del login]()
