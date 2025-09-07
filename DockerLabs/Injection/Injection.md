@@ -95,4 +95,5 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 En el puerto 22 nos encontramos con un servicio OpenSSH actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
-!
+
+![Panel de Login](DockerLabs/Injection/Imágenes/Injection_PanelLogin.png)
