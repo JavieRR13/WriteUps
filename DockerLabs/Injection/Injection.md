@@ -104,4 +104,4 @@ Tras acceder a la web nos encontramos con un panel de login en el cual probaremo
 
 ### Inyección SQL
 En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona.
-![Verificación del login]()
+![Verificación del login](https://github.com/JavieRR13/WriteUps/blob/7822d55fd459467c092cd53b1ffe3725a01209cd/DockerLabs/Injection/Im%C3%A1genes/Injection_VerificacionLogin.png)
