@@ -190,3 +190,4 @@ dylan@127ef1d0b8b9:~$ find / -type f -perm -4000 2>/dev/null
 /usr/bin/passwd
 ```
 De todos estos archivos el más explotable es ``/usr/bin/env puesto que con env podemos ejecutar un programa con un entorno modificado.  Para encontrar alguna vulnerabilidad en este binario ejecutable podemos dirigirnos a [GTFOBins](https://gtfobins.github.io/gtfobins/env/#shell) y buscar en el binario correspondiente, en este caso *env*.
+[GTFOBins]()
