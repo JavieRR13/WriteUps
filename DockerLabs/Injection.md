@@ -58,10 +58,9 @@ Para simplificarnos el visionado de los puertos abiertos directamente abriremos 
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 Una vez localizados los puertos abiertos, continuaremos con el escaneo específico de los mismos para ver que servicios y versiones corren por ellos.
-
 ``❯ nmap -p22,80 -sCV 172.17.0.2 -oN targeted``
 
-*El parámetro -sCV es una conjunción de los parámetros:
+* El parámetro -sCV es una conjunción de los parámetros:
   * -sC: Ejecuta los scripts de Nmap por defecto (Default Scripts) para el host/puerto para detectar vulnerabilidades básicas, información de banners, servicios públicos, etc..
   * -sV: Detecta la versión del servicio que corre en cada puerto abierto.
 * Con -oN exportamos la evidencia en un archivo con formato Nmap para dejarlo registrado.
@@ -95,4 +94,5 @@ Al igual que antes, para que la visualización de toda la información sea más 
   21   │ # Nmap done at Sun Sep  7 17:14:28 2025 -- 1 IP address (1 host up) scanned in 7.72 seconds
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
-
+En el puerto 22 nos encontramos con un servicio OpenSSH actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
+!
