@@ -106,7 +106,7 @@ Tras acceder a la web nos encontramos con un panel de login en el cual probaremo
 2. Hacer uso de la herramienta SQLmap
 
 ### 1. Inyección SQL
-En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona y nos dirige a la página "172.17.0.2/acceso_valido_dylan.php" con un mensaje con lo que parece un usuario y una contraseña.
+En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona y nos dirige a la página *172.17.0.2/acceso_valido_dylan.php* con un mensaje con lo que parece un usuario y una contraseña.
 ![Verificación del login](https://github.com/JavieRR13/WriteUps/blob/7822d55fd459467c092cd53b1ffe3725a01209cd/DockerLabs/Injection/Im%C3%A1genes/Injection_VerificacionLogin.png)
 ![Usuario y contraseña](https://github.com/JavieRR13/WriteUps/blob/489a64f2311f3532d2e8038ab675cf76a087ad30/DockerLabs/Injection/Im%C3%A1genes/Injection_Contrase%C3%B1a_Usuario.png)
 ¿Cómo funciona?
@@ -123,7 +123,7 @@ SELECT * FROM usuarios WHERE usuario = '' or 1=1 --' AND contraseña = 'contrase
 * -- convierte el resto de la línea en un comentario, por lo que la verificación de contraseña se ignora totalmente.
 
 Con esta información vamos a intentar logaearnos en el servicio SSH y ver si conseguimos acceso a un posible usuario *Dylan*.
-```C
+```ruby
 ❯ ssh dylan@172.17.0.2
 dylan@172.17.0.2's password: 
 Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 6.12.38+kali-amd64 x86_64)
@@ -199,3 +199,6 @@ dylan@127ef1d0b8b9:~$ /usr/bin/env /bin/sh -p
 root
 ```
 🥳CONSEGUIDO, SOMOS ROOT🥳
+### 2. SQLmap
+Primero debemos rellenar el cuestionario con datos aleatorios, esto actualizará la url de la página en el navegador y nos añadirá el subdominio *172.17.0.2/index.php*. Ahora, una vez que sabemos como se llama la página del formulario, nos dirigiremos a la terminal y con la herramienta [SQLmap](https://github.com/sqlmapproject/sqlmap) buscaremos todas las bases de datos que se encuentren en este sistema.
+``sqlmap -u http://172.17.0.2/index.php --forms --dbs --batch``   
