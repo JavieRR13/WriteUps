@@ -11,7 +11,7 @@
 4. Por último, la desplegaremos mediante sudo bash auto_deploy.sh <máquina.tar> y se nos proporcionará una IP, en mi caso 172.17.0.2.
 ## RESOLUCIÓN
 Primero comprobaremos la conectividad con la máquina. 
-```
+```bash
 > ping -c1 172.17.0.2
 PING 172.17.0.2 (172.17.0.2) 56(84) bytes of data.
 64 bytes from 172.17.0.2: icmp_seq=1 ttl=64 time=4.45 ms
@@ -28,8 +28,9 @@ rtt min/avg/max/mdev = 4.447/4.447/4.447/0.000 ms
   * Tenemos un ttl = 64, lo que quiere decir que nos encontramos ante un sistema Linux.
 
 Una vez visto que tenemos conectividad comenzaremos con el escaneo de puertos.  Para ello ejecutaremos:
-
-``❯ nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 172.17.0.2 -oG allPorts``
+```bash
+❯ nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 172.17.0.2 -oG allPorts
+```
 * Con -p- escaneamos el rango completo de puertos (65535).
 * Con --open añadimos que de esos solo nos interesan los abiertos.
 * Con -sS seleccionamos que el tipo de escaneo será de tipo SYN Scan. Este se caracteriza por ser rápido y sigiloso puesto que no se completa el three-way handshake.
@@ -37,15 +38,15 @@ Una vez visto que tenemos conectividad comenzaremos con el escaneo de puertos.  
     * SYN/ACK recibido → el puerto está abierto.
     * RST (Reset) recibido → el puerto está cerrado.
     * Sin respuesta o ICMP error → el puerto está filtrado (por firewall).
-  * Si el puerto estaba abierto (SYN/ACK), Nmap no completa la conexión: envía un RST para “cortar” el handshake y no dejar un rastro evidente.
+  * Si el puerto estaba abierto (SYN/ACK), Nmap no completa la conexión: envía un RST para interrumpir el handshake y no dejar un rastro evidente.
 * Con --min-rate 5000 indicamos que queremos un envío de 5000 paquetes por segundo.
 * Con -vvv (triple verbose) se muestra por consola la información detallada y actualizada al momento.
 * Con -n indicaremos que no queremos resolución DNS, trabajaremos directamente con direcciones IP.
 * Con -Pn queremos que no se haga ping al host antes de comenzar el escaneo, asumiendo que está activo.
 * Por último, con -oG exportamos la evidencia en un archivo con formato grepeable para facilitar su procesamiento en auditorias.
 
-Para simplificarnos el visionado de los puertos abiertos directamente abriremos el archivo "allPorts".
-```
+Para simplificarnos el visionado de los puertos abiertos directamente abriremos el archivo *allPorts*.
+```bash
 ❯ cat allPorts
 ───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: allPorts
@@ -58,16 +59,18 @@ Para simplificarnos el visionado de los puertos abiertos directamente abriremos 
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 Una vez localizados los puertos abiertos, continuaremos con el escaneo específico de los mismos para ver que servicios y versiones corren por ellos.
-``❯ nmap -p22,80 -sCV 172.17.0.2 -oN targeted``
+```bash
+❯ nmap -p22,80 -sCV 172.17.0.2 -oN targeted
+```
 
 * El parámetro -sCV es una conjunción de los parámetros:
   * -sC: Ejecuta los scripts de Nmap por defecto (Default Scripts) para el host/puerto para detectar vulnerabilidades básicas, información de banners, servicios públicos, etc..
   * -sV: Detecta la versión del servicio que corre en cada puerto abierto.
 * Con -oN exportamos la evidencia en un archivo con formato Nmap para dejarlo registrado.
 
-Al igual que antes, para que la visualización de toda la información sea más cómoda, la analizaremos desde el archivo que acabamos de generar.
-```
-❯ cat targeted
+Al igual que antes, para que la visualización de toda la información sea más cómoda, la analizaremos desde el archivo *targeted* que acabamos de generar.
+```java
+❯ cat targeted -l java
 ───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: targeted
 ───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -94,7 +97,7 @@ Al igual que antes, para que la visualización de toda la información sea más 
   21   │ # Nmap done at Sun Sep  7 17:14:28 2025 -- 1 IP address (1 host up) scanned in 7.72 seconds
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
-En el puerto 22 nos encontramos con un servicio OpenSSH actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
+En el puerto 22 nos encontramos con un servicio *OpenSSH* actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
 
 ![Panel de Login](https://github.com/JavieRR13/WriteUps/blob/9b5fe63cc7ac5bb28d3908e2bde8db8f0f18ac69/DockerLabs/Injection/Im%C3%A1genes/Injection_PanelLogin.png)
 
@@ -103,6 +106,44 @@ Tras acceder a la web nos encontramos con un panel de login en el cual probaremo
 2. Hacer uso de la herramienta SQLmap
 
 ### Inyección SQL
-En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona y nos dirige a la página 172.17.0.2/acceso_valido_dylan.php con un mensaje con lo que parece un usuario y una contraseña.
+En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona y nos dirige a la página "172.17.0.2/acceso_valido_dylan.php" con un mensaje con lo que parece un usuario y una contraseña.
 ![Verificación del login](https://github.com/JavieRR13/WriteUps/blob/7822d55fd459467c092cd53b1ffe3725a01209cd/DockerLabs/Injection/Im%C3%A1genes/Injection_VerificacionLogin.png)
 ![Usuario y contraseña](https://github.com/JavieRR13/WriteUps/blob/489a64f2311f3532d2e8038ab675cf76a087ad30/DockerLabs/Injection/Im%C3%A1genes/Injection_Contrase%C3%B1a_Usuario.png)
+¿Cómo funciona?
+* Imaginemos que tenemos un formulario de inicio de sesión con un SQL no sanitizado con la consulta: ``SELECT * FROM usuarios WHERE usuario = 'INPUT' AND contraseña = 'INPUT';`` 
+* El ``or 1=1`` siempre devuelve verdadero.
+* El ``--`` es un comentario en SQL, que ignora el resto de la consulta (incluida la validación de contraseña).
+* Por lo tanto la consulta se transforma en
+```sql
+SELECT * FROM usuarios WHERE usuario = '' or 1=1 --' AND contraseña = 'contraseñaRandom';
+```
+¿Qué pasa?
+* '' es un string vacío.
+* or 1=1 siempre es verdadero, así que la condición global del WHERE se cumple.
+* -- convierte el resto de la línea en un comentario, por lo que la verificación de contraseña se ignora totalmente.
+
+Con esta información vamos a intentar logaearnos en el servicio SSH y ver si conseguimos acceso a un posible usuario *Dylan*.
+```
+❯ ssh dylan@172.17.0.2
+dylan@172.17.0.2's password: 
+Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 6.12.38+kali-amd64 x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+dylan@127ef1d0b8b9:~$ whoami
+dylan
+```
