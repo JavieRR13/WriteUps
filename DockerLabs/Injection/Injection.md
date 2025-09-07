@@ -103,5 +103,6 @@ Tras acceder a la web nos encontramos con un panel de login en el cual probaremo
 2. Hacer uso de la herramienta SQLmap
 
 ### Inyección SQL
-En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona.
+En nuestro caso vamos a probar con "' or 1=1 --" y una contraseña aleatoria. Vemos que funciona y nos dirige a la página 172.17.0.2/acceso_valido_dylan.php con un mensaje con lo que parece un usuario y una contraseña.
 ![Verificación del login](https://github.com/JavieRR13/WriteUps/blob/7822d55fd459467c092cd53b1ffe3725a01209cd/DockerLabs/Injection/Im%C3%A1genes/Injection_VerificacionLogin.png)
+![Usuario y contraseña](https://github.com/JavieRR13/WriteUps/blob/489a64f2311f3532d2e8038ab675cf76a087ad30/DockerLabs/Injection/Im%C3%A1genes/Injection_Contrase%C3%B1a_Usuario.png)
