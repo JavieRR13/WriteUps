@@ -267,3 +267,4 @@ permitted by applicable law.
 root@90f44a27e698:~# whoami
 root
 ```
+🥳CONSEGUIDO, SOMOS ROOT🥳
