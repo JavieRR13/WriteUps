@@ -161,6 +161,13 @@ msf auxiliary(scanner/ssh/ssh_enumusers) > run
 [+] Scanned 1 of 1 hosts (100% complete)
 [+] Auxiliary module execution completed
 ```
+Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta "Hydra" utilizando *lovely* como nombre de usuario y el diccionario "rockyou.txt" para comprobar contraseñas.
+
+* Con -l seleccionamos el usuario.
+* Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
+* Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
+Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *mario*.
+Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
 Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *lovely* como nombre de usuario y el diccionario [rockyou.txt](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
 
 
