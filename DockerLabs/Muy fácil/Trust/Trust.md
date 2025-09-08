@@ -166,10 +166,15 @@ mario@99ebdb36daec:~$ whoami
 mario
 ```
 Una vez dentro de la máquina víctima, vamos a intentar listar todos los privilegios de sudo del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo. 
+```ruby
+mario@99ebdb36daec:~$ sudo -l
+[sudo] password for mario: 
+Matching Defaults entries for mario on 99ebdb36daec:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
 
-
-
-
-
-
+User mario may run the following commands on 99ebdb36daec:
+    (ALL) /usr/bin/vim
+```
+Sabiendo que podemos ejecutar Vim con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/vim/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
+![GTFOBins vim]()
 🥳CONSEGUIDO, SOMOS ROOT🥳
