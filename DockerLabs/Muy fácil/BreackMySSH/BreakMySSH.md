@@ -161,5 +161,6 @@ msf auxiliary(scanner/ssh/ssh_enumusers) > run
 [+] Scanned 1 of 1 hosts (100% complete)
 [+] Auxiliary module execution completed
 ```
-Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *lovely* como nombre de usuario y el diccionario [rockyou.txt]((https://github.com/topics/rockyou-wordlist)) para comprobar contraseñas.
+Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *lovely* como nombre de usuario y el diccionario [rockyou.txt](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
+
 
