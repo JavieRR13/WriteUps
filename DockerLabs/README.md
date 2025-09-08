@@ -66,4 +66,4 @@ Todos los writeups tienen fines educativos y están destinados únicamente a usa
 
 Iré subiendo mis writeups poco a poco, empezando por las máquinas de nivel Muy Fácil y avanzando en dificultad.
 
-💬 Comentarios y sugerencias siempre son bienvenidos. [Mario Álvarez Fernández](https://www.linkedin.com/in/maalfer1/?originalSubdomain=es).
+💬 Comentarios y sugerencias siempre son bienvenidos.
