@@ -162,7 +162,7 @@ msf auxiliary(scanner/ssh/ssh_enumusers) > run
 [+] Auxiliary module execution completed
 ```
 Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *lovely* como nombre de usuario y el diccionario [rockyou](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
-```ruby
+```py
 ❯ hydra -l lovely -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2
 Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
@@ -181,7 +181,9 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 16:49:
 * Con -l seleccionamos el usuario.
 * Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
 * Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
+
 Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *lovely*.
+
 Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
 
 
