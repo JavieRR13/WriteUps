@@ -253,4 +253,17 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 21:37:
 * Con -p inidcamos la password.
 * Con -f indicamos que finalice la ejecución una vez encuentre un parámetro válido.
 
-Como respuesta nos hemos encontrado con que el usuario *root*
+Este proceso nos ha dado como resultado que la contraseña *estrella* puede pertenecer al usuario *root*.  Así que lo probamos y...
+```ruby
+❯ ssh root@172.17.0.2
+root@172.17.0.2's password: 
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+root@90f44a27e698:~# whoami
+root
+```
