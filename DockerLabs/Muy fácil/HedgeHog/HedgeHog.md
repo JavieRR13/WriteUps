@@ -95,7 +95,33 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ```
 En el puerto 22 nos encontramos con un servicio *OpenSSH* actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
 
-![Mensaje](https://github.com/JavieRR13/WriteUps/blob/9b5fe63cc7ac5bb28d3908e2bde8db8f0f18ac69/DockerLabs/Injection/Im%C3%A1genes/Injection_PanelLogin.png)
+![Mensaje](https://github.com/JavieRR13/WriteUps/blob/70493b2edc4bdf17463586f8e449dda90b448450/DockerLabs/Muy%20f%C3%A1cil/HedgeHog/Im%C3%A1genes/HedgeHog_Mensaje.png)
+En la web solo nos encontramos con este mensaje.  Inspeccionando un poco el código fuente de la página tampoco parece haber nada.  Lo único que nos queda es asumir que es un usuario válido en SSH y probarlo con un ataque de fuerza bruta utilizando [Hydra](https://github.com/vanhauser-thc/thc-hydra) usando "tails" como nombre de usuario y el diccionario "rockyou.txt" para comprobar contraseñas.
+```ruby
+hydra -l tails -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 22:56:22
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://172.17.0.2:22/
+[STATUS] 252.00 tries/min, 252 tries in 00:01h, 14344148 to do in 948:42h, 15 active
+```
+Tras 10 minutos de espera y, sin ninguna respueta, empiezo a plantearme que algo estoy haciendo mal.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Tras acceder a la web nos encontramos con un panel de login en el cual probaremos a usar el clásico user: admin/password: admin que, como era lógico, no iba a funcionar. Ahora tenemos dos opciones:
 1. Probar con una inyección SQL.
