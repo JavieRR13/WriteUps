@@ -182,8 +182,55 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 16:49:
 * Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
 * Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
 
-Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *lovely*.
+Como era de esperar, estamos dentro del servicio SSH con el usuario *lovely*.  
 
-Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
+Para continuar, vamos a intentar listar todos los privilegios de *sudo* del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo.
+```ruby
+lovely@90f44a27e698:~$ sudo -l
+-bash: sudo: command not found
+```
+Vemos que nos ha devuelto que el comando *sudo* no se ha encontrado así que no listaremos permisos de sudoers.  Esto puede ser por:
+* El sistema está minimalista (por ejemplo, contenedores, sistemas de pruebas, o ciertos servidores SSH).
+* Tu usuario no tiene permisos para sudo, o sudo no está instalado.
 
+La siguiente opción es buscar permisos SUID.  El SUID (Set User ID) es un bit especial de permisos en sistemas tipo Unix/Linux que se aplica a archivos ejecutables. Su función principal es permitir que un programa se ejecute con los permisos del propietario del archivo, en lugar de los permisos del usuario que lo ejecuta. Esto puede ser útil para ciertas tareas que requieren privilegios elevados, sin dar acceso completo al usuario.  Para ello ejecutaremos: 
+```ruby 
+lovely@90f44a27e698:~$ find / -type f -perm -4000 2>/dev/null
+/usr/local/libexec/ssh-keysign
+/usr/bin/chsh
+/usr/bin/gpasswd
+/usr/bin/newgrp
+/usr/bin/chfn
+/usr/bin/passwd
+/bin/su
+/bin/umount
+/bin/ping
+/bin/mount 
+```
+* Con find buscamos archivos y directorios en Linux.
+* Con / indicamos desde la raíz del sistema (es decir, busca en todo el sistema de archivos).
+* Con -type filtramos el tipo de archivo que queremos encontrar.
+* f significa *file* (archivo regular).
+* Con -perm filtramos por permisos específicos.
+* El bit 4000 corresponde al bit SUID:
+  * 4000 indica “ejecutar con los permisos del propietario”.
+  * El - antes de 4000 significa que cualquier archivo que tenga este bit SUID activado será incluido, aunque tenga otros permisos también.
+* Con 2>/dev/null conseguimos que la salida solo muestre los archivos válidos y no los errores.
+  * 2 es el descriptor de error (stderr).
+  * /dev/null es un archivo especial en Linux que descarta todo lo que se escriba en él.
 
+En esta salida podemos ver que no encontramos ningún binario que nos pueda proporcionar un escalado de privilegios de forma sencilla, por lo que decido investigar por el sistema a ver si hay algún archivo o directorio que pueda contener algo de información. 
+```ruby
+lovely@90f44a27e698:~$ pwd
+/home/lovely
+lovely@90f44a27e698:~$ ls -a
+.  ..  .bash_logout  .bashrc  .profile
+lovely@90f44a27e698:~$ cd ../..
+lovely@90f44a27e698:/$ ls -a
+.  ..  .dockerenv  bin  boot  dev  docker-entrypoint.sh  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+lovely@90f44a27e698:/$ ls -a /opt
+.  ..  .hash
+lovely@90f44a27e698:/$ cat opt/.hash
+aa87ddc5b4c24406d26ddad771ef44b0
+```
+Trasteando un poco nos encontramos con un fichero oculto llamado *hash*, el cual, si lo inspeccionamos, contendrá lo que parece un hash.  Lo copiamos y nos dirigiremos a la web de [CarckStation](https://crackstation.net/) y descrackemos el hash.  Como resultado nos dará que es un hash hecho con un algoritmo md5 y oculta la palabra *estrella*.
