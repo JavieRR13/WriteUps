@@ -181,11 +181,24 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 16:49:
 * Con -l seleccionamos el usuario.
 * Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
 * Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
-* 
+
 Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *lovely*.
 Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
+```ruby
+❯ ssh lovely@172.17.0.2
+lovely@172.17.0.2's password: 
+Linux 99ebdb36daec 6.12.38+kali-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.12.38-1kali1 (2025-08-12) x86_64
 
-Como era de esperar, estamos dentro del servicio SSH con el usuario *lovely*.  
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Wed Mar 20 09:54:46 2024 from 192.168.0.21
+lovely@90f44a27e698:~$ whoami
+lovely
+``` 
 
 Para continuar, vamos a intentar listar todos los privilegios de *sudo* del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo.
 ```ruby
