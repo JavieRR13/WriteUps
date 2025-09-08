@@ -96,7 +96,7 @@ Al igual que antes, para que la visualización de toda la información sea más 
 En el puerto 22 nos encontramos con un servicio *OpenSSH* actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
 
 ![Mensaje](https://github.com/JavieRR13/WriteUps/blob/70493b2edc4bdf17463586f8e449dda90b448450/DockerLabs/Muy%20f%C3%A1cil/HedgeHog/Im%C3%A1genes/HedgeHog_Mensaje.png)
-En la web solo nos encontramos con este mensaje.  Inspeccionando un poco el código fuente de la página tampoco parece haber nada.  Lo único que nos queda es asumir que es un usuario válido en SSH y probarlo con un ataque de fuerza bruta utilizando [Hydra](https://github.com/vanhauser-thc/thc-hydra) usando "tails" como nombre de usuario y el diccionario [rockyou.txt](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
+En la web solo nos encontramos con este mensaje.  Inspeccionando un poco el código fuente de la página tampoco parece haber nada.  Lo único que nos queda es asumir que es un usuario válido en SSH y probarlo con un ataque de fuerza bruta utilizando [Hydra](https://github.com/vanhauser-thc/thc-hydra) usando "tails" como nombre de usuario y el diccionario [rockyou](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
 ```ruby
 > hydra -l tails -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2
 Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
