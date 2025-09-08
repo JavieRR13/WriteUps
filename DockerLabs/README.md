@@ -47,8 +47,12 @@ Las máquinas estarán clasificadas por dificultad:
       │    ├── Maquina7.md
       │    └── Imagenes/
       │         ├── Imagen1/
-      │         └── Imagen2
-
+      │         └── Imagen2/
+      └── Maquina8/
+           ├── Maquina8.md
+           └── Imagenes/
+                ├── Imagen1/
+                └── Imagen2/
 ```
 
 👉 Cada archivo .md contendrá el writeup completo de la máquina correspondiente.
