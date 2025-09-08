@@ -148,6 +148,7 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 10:56:
 * Con -l seleccionamos el usuario.
 * Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
 * Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
+
 Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *mario*.
 Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
 ```ruby
