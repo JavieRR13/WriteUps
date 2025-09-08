@@ -74,21 +74,28 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: targeted
 ───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-   1   │ # Nmap 7.95 scan initiated Mon Sep  8 22:37:49 2025 as: /usr/lib/nmap/nmap --privileged -p22,80 -sCV -oN targeted 172.18.0.2
-   2   │ Nmap scan report for 172.18.0.2
-   3   │ Host is up (0.0086s latency).
+   1   │ # Nmap 7.95 scan initiated Mon Sep  8 22:39:43 2025 as: /usr/lib/nmap/nmap --privileged -p22,80 -sCV -oN targeted 172.17.0.2
+   2   │ Nmap scan report for 172.17.0.2
+   3   │ Host is up (0.00s latency).
    4   │ 
-   5   │ PORT   STATE    SERVICE VERSION
-   6   │ 22/tcp filtered ssh
-   7   │ 80/tcp filtered http
-   8   │ 
-   9   │ Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-  10   │ # Nmap done at Mon Sep  8 22:37:58 2025 -- 1 IP address (1 host up) scanned in 8.81 seconds
+   5   │ PORT   STATE SERVICE VERSION
+   6   │ 22/tcp open  ssh     OpenSSH 9.6p1 Ubuntu 3ubuntu13.5 (Ubuntu Linux; protocol 2.0)
+   7   │ | ssh-hostkey: 
+   8   │ |   256 34:0d:04:25:20:b6:e5:fc:c9:0d:cb:c9:6c:ef:bb:a0 (ECDSA)
+   9   │ |_  256 05:56:e3:50:e8:f4:35:96:fe:6b:94:c9:da:e9:47:1f (ED25519)
+  10   │ 80/tcp open  http    Apache httpd 2.4.58 ((Ubuntu))
+  11   │ |_http-title: Site doesn't have a title (text/html).
+  12   │ |_http-server-header: Apache/2.4.58 (Ubuntu)
+  13   │ MAC Address: 02:42:AC:11:00:02 (Unknown)
+  14   │ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+  15   │ 
+  16   │ Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+  17   │ # Nmap done at Mon Sep  8 22:39:52 2025 -- 1 IP address (1 host up) scanned in 9.41 seconds
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 En el puerto 22 nos encontramos con un servicio *OpenSSH* actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
 
-![Panel de Login](https://github.com/JavieRR13/WriteUps/blob/9b5fe63cc7ac5bb28d3908e2bde8db8f0f18ac69/DockerLabs/Injection/Im%C3%A1genes/Injection_PanelLogin.png)
+![Mensaje](https://github.com/JavieRR13/WriteUps/blob/9b5fe63cc7ac5bb28d3908e2bde8db8f0f18ac69/DockerLabs/Injection/Im%C3%A1genes/Injection_PanelLogin.png)
 
 Tras acceder a la web nos encontramos con un panel de login en el cual probaremos a usar el clásico user: admin/password: admin que, como era lógico, no iba a funcionar. Ahora tenemos dos opciones:
 1. Probar con una inyección SQL.
