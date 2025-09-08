@@ -10,17 +10,45 @@ Las máquinas estarán clasificadas por dificultad:
 ```
 /DockerLabs/
  ├── Muy-Facil/
- │    ├── Maquina1.md
- │    └── Maquina2.md
+ │    ├── Maquina1/
+ │    │    ├── Maquina1.md
+ │    │    └── Imagenes/
+ │    │         ├── Imagen1/
+ │    │         └── Imagen2/
+ │    └── Maquina2/
+ │         ├── Maquina2.md
+ │         └── Imagenes/
+ │              ├── Imagen1/
+ │              └── Imagen2/
  ├── Facil/
- │    ├── Maquina3.md
- │    └── Maquina4.md
+ │    ├── Maquina3/
+ │    │    ├── Maquina3.md
+ │    │    └── Imagenes/
+ │    │         ├── Imagen1/
+ │    │         └── Imagen2/
+ │    └── Maquina4/
+ │         ├── Maquina4.md
+ │         └── Imagenes/
+ │              ├── Imagen1/
+ │              └── Imagen2/
  ├── Medio/
- │    ├── Maquina5.md
- │    └── Maquina6.md
+ │    ├── Maquina5/
+ │    │    ├── Maquina5.md
+ │    │    └── Imagenes/
+ │    │         ├── Imagen1/
+ │    │         └── Imagen2/
+ │    └── Maquina6/
+ │         ├── Maquina6.md
+ │         └── Imagenes/
+ │              ├── Imagen1/
+ │              └── Imagen2/
  └── Dificil/
-      ├── Maquina7.md
-      └── Maquina8.md
+      ├── Maquina7/
+      │    ├── Maquina7.md
+      │    └── Imagenes/
+      │         ├── Imagen1/
+      │         └── Imagen2
+
 ```
 
 👉 Cada archivo .md contendrá el writeup completo de la máquina correspondiente.
