@@ -165,7 +165,7 @@ Last login: Wed Mar 20 09:54:46 2024 from 192.168.0.21
 mario@99ebdb36daec:~$ whoami
 mario
 ```
-Una vez dentro de la máquina víctima, vamos a listar 
+Una vez dentro de la máquina víctima, vamos a intentar listar todos los privilegios de sudo del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo. 
 
 
 
