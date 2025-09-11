@@ -203,3 +203,4 @@ root
 root@bf71f7833063:/home/borazuwarah# 
 ```
 
+🥳CONSEGUIDO, SOMOS ROOT🥳
