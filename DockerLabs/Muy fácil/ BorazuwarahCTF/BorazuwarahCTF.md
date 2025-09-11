@@ -184,4 +184,12 @@ permitted by applicable law.
 borazuwarah@bf71f7833063:~$ whoami
 borazuwarah
 ```
-Como era de esperar, estamos dentro del servicio SSH con el usuario *borazuwarah*.  
+Una vez dentro de la máquina víctima, vamos a intentar listar todos los privilegios de sudo del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo.  
+```ruby
+borazuwarah@bf71f7833063:~$ sudo -l
+Matching Defaults entries for borazuwarah on bf71f7833063:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
+
+User borazuwarah may run the following commands on bf71f7833063:
+    (ALL : ALL) ALL
+    (ALL) NOPASSWD: /bin/bash```
