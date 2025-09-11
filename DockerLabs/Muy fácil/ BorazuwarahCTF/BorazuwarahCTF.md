@@ -94,3 +94,6 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 Como podemos observar nos encontramos ante un servicio SSH con una versión actualizada por lo que lo dejaremos para más tarde. Mientras tanto me dirigiré al navegador web para examinar el servicio HTTP.
+![Imagen Kinder]()
+
+Cuando abrimos la página nos encontraremos frente a una imagen de un huevo Kinder. Si miramos el código fuente de la página observamos que lo único resaltable es dicha imagen.  Para continuar probaremos con un poco de esteganografía así que descargaremos la imagen y la analizaremos con la herramienta [steghide](https://github.com/StegHigh/steghide).  Con esta herramienta podremos analizar datos ocultos dentro de la imagen.  
