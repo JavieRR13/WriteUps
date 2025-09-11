@@ -94,6 +94,64 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 Como podemos observar nos encontramos ante un servicio SSH con una versión actualizada por lo que lo dejaremos para más tarde. Mientras tanto me dirigiré al navegador web para examinar el servicio HTTP.
-![Imagen Kinder]()
 
-Cuando abrimos la página nos encontraremos frente a una imagen de un huevo Kinder. Si miramos el código fuente de la página observamos que lo único resaltable es dicha imagen.  Para continuar probaremos con un poco de esteganografía así que descargaremos la imagen y la analizaremos con la herramienta [steghide](https://github.com/StegHigh/steghide).  Con esta herramienta podremos analizar datos ocultos dentro de la imagen.  
+![Imagen Kinder](https://github.com/JavieRR13/WriteUps/blob/3995070a1ce6446556f883f9c8f6cc7851780fcb/DockerLabs/Muy%20f%C3%A1cil/%20BorazuwarahCTF/Im%C3%A1genes/BorazuwarahCTF_ImagenKinder.png)
+
+Cuando abrimos la página nos encontraremos frente a una imagen de un huevo Kinder. Si miramos el código fuente lo único resaltable es dicha imagen.  Para continuar, probaremos con un poco de esteganografía así que descargaremos la imagen y la analizaremos con la herramienta [steghide](https://github.com/StegHigh/steghide).  Con esta herramienta podremos analizar datos ocultos dentro de la imagen.  
+```ruby
+❯ steghide extract -sf imagen.jpeg
+Anotar salvoconducto: 
+anot� los datos extra�dos e/"secreto.txt".
+❯ ll
+total 24K
+-rw-rw-r-- 1 kali kali 19K sep 11 12:51 imagen.jpeg
+-rw-rw-r-- 1 kali kali 104 sep 11 13:08 secreto.txt
+```
+
+* Con extract indicamos que queremos extraer el archivo oculto (si lo hay).
+* Con -sf (stego file) indicamos el archivo que pensamos podría contener datos ocultos.
+
+Vemos que nos ha descargado un archivo llamado *secreto.txt* que estaba oculto en la imagen.
+```ruby
+❯ cat secreto.txt
+───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: secreto.txt
+───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ Sigue buscando, aquí no está to solución
+   2   │ aunque te dejo una pista....
+   3   │ sigue buscando en la imagen!!!
+───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+```
+
+Visto que no hemos obtenido mucha información de este fichero, otra opción es hacer uso de la herramienta [ExifTool](https://github.com/exiftool/exiftool) para analizar los metadatos que pueda contener.
+```ruby
+❯ exiftool imagen.jpeg
+ExifTool Version Number         : 13.25
+File Name                       : imagen.jpeg
+Directory                       : .
+File Size                       : 19 kB
+File Modification Date/Time     : 2025:09:11 12:51:14+02:00
+File Access Date/Time           : 2025:09:11 13:08:03+02:00
+File Inode Change Date/Time     : 2025:09:11 12:51:14+02:00
+File Permissions                : -rw-rw-r--
+File Type                       : JPEG
+File Type Extension             : jpg
+MIME Type                       : image/jpeg
+JFIF Version                    : 1.01
+Resolution Unit                 : None
+X Resolution                    : 1
+Y Resolution                    : 1
+XMP Toolkit                     : Image::ExifTool 12.76
+Description                     : ---------- User: borazuwarah ----------
+Title                           : ---------- Password:  ----------
+Image Width                     : 455
+Image Height                    : 455
+Encoding Process                : Baseline DCT, Huffman coding
+Bits Per Sample                 : 8
+Color Components                : 3
+Y Cb Cr Sub Sampling            : YCbCr4:2:0 (2 2)
+Image Size                      : 455x455
+Megapixels                      : 0.207
+```
+
+Podemos observar que el análisis nos ha reportado un nombre de usuario el cual podría ser válido para el servicio SSH que habíamos visto anteriormente.  Pero, para ello, primero debemos obtener el password.  Pa
