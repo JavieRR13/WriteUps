@@ -192,4 +192,14 @@ Matching Defaults entries for borazuwarah on bf71f7833063:
 
 User borazuwarah may run the following commands on bf71f7833063:
     (ALL : ALL) ALL
-    (ALL) NOPASSWD: /bin/bash```
+    (ALL) NOPASSWD: /bin/bash
+```
+
+Sabiendo que podemos abrir una terminal directamente con los privilegios de *sudo* lo hacemos y...
+```ruby
+borazuwarah@bf71f7833063:~$ sudo /bin/bash
+root@bf71f7833063:/home/borazuwarah# whoami
+root
+root@bf71f7833063:/home/borazuwarah# 
+```
+
