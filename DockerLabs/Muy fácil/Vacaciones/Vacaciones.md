@@ -95,3 +95,16 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 
+Vemos que la versión que presenta el servicio OpenSSH es inferior a la 7.7 y recordemos que estas versiones presentan vulnerabilidades conocidas.  Para cercionarnos lo comprobaremos con [SearchSploit](https://github.com/topics/searchsploit).
+```
+❯ searchsploit "Open SSH 7.6p1"
+----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+ Exploit Title                                                                                                                                             |  Path
+----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+OpenSSH 2.3 < 7.7 - Username Enumeration                                                                                                                   | linux/remote/45233.py
+OpenSSH 2.3 < 7.7 - Username Enumeration (PoC)                                                                                                             | linux/remote/45210.py
+OpenSSH < 7.7 - User Enumeration (2)                                                                                                                       | linux/remote/45939.py
+----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
+```
+Efectivamente si hay una vulnerabilidad pero, viendo el código de los scripts utilizan librerías y versiones inferiores a las que tengo yo ahora mismo en uso.  Como no quiero tener que modificar mi sistema o configurar un contenedor voy a analizar primero la web a ver si encuentro algo de información relevante.y
+
