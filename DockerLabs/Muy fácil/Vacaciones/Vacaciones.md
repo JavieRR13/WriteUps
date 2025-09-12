@@ -147,3 +147,16 @@ camilo@172.17.0.2's password:
 $ whoami
 camilo
 ```
+
+Para continuar, vamos a intentar listar todos los privilegios de *sudo* del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo.
+```ruby
+$ sudo -l
+[sudo] password for camilo: 
+Sorry, user camilo may not run sudo on 8ff01ee76a19.
+```
+Vemos que nos ha devuelto que el comando *sudo* no se ha encontrado así que no listaremos permisos de sudoers.  Esto puede ser por:
+* El sistema está minimalista (por ejemplo, contenedores, sistemas de pruebas, o ciertos servidores SSH).
+* Tu usuario no tiene permisos para sudo, o sudo no está instalado.
+
+La siguiente opción es buscar permisos SUID.  El SUID (Set User ID) es un bit especial de permisos en sistemas tipo Unix/Linux que se aplica a archivos ejecutables. Su función principal es permitir que un programa se ejecute con los permisos del propietario del archivo, en lugar de los permisos del usuario que lo ejecuta. Esto puede ser útil para ciertas tareas que requieren privilegios elevados, sin dar acceso completo al usuario.  Para ello ejecutaremos: 
+
