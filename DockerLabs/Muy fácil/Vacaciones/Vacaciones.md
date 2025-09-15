@@ -160,7 +160,7 @@ Vemos que nos ha devuelto que el comando *sudo* no se ha encontrado así que no 
 
 La siguiente opción es buscar permisos SUID.  El SUID (Set User ID) es un bit especial de permisos en sistemas tipo Unix/Linux que se aplica a archivos ejecutables. Su función principal es permitir que un programa se ejecute con los permisos del propietario del archivo, en lugar de los permisos del usuario que lo ejecuta. Esto puede ser útil para ciertas tareas que requieren privilegios elevados, sin dar acceso completo al usuario.  Para ello ejecutaremos: 
 
-```
+```ruby
 $ find / -perm /4000 2>/dev/null
 /usr/lib/openssh/ssh-keysign
 /usr/lib/dbus-1.0/dbus-daemon-launch-helper
@@ -174,6 +174,20 @@ $ find / -perm /4000 2>/dev/null
 /bin/umount
 /bin/mount
 ```
+
+* Con find buscamos archivos y directorios en Linux.
+* Con / indicamos desde la raíz del sistema (es decir, busca en todo el sistema de archivos).
+* Con -type filtramos el tipo de archivo que queremos encontrar.
+* f significa *file* (archivo regular).
+* Con -perm filtramos por permisos específicos.
+* El bit 4000 corresponde al bit SUID:
+  * 4000 indica “ejecutar con los permisos del propietario”.
+  * El - antes de 4000 significa que cualquier archivo que tenga este bit SUID activado será incluido, aunque tenga otros permisos también.
+* Con 2>/dev/null conseguimos que la salida solo muestre los archivos válidos y no los errores.
+  * 2 es el descriptor de error (stderr).
+  * /dev/null es un archivo especial en Linux que descarta todo lo que se escriba en él.
+
+En esta salida podemos ver que no encontramos ningún binario que nos pueda proporcionar un escalado de privilegios de forma sencilla, por lo que decido investigar por el sistema a ver si hay algún archivo o directorio que pueda contener algo de información.
 
 ```ruby
 ❯ ssh camilo@172.17.0.2
@@ -208,4 +222,13 @@ Hola Camilo,
 
 Me voy de vacaciones y no he terminado el trabajo que me dio el jefe. Por si acaso lo pide, aquí tienes la contraseña: 2k84dicb
 $ 
+```
+Trasteando por el sistema un rato encontramos un archivo *correo.txt* el cual parece tener alojada las credenciales de acceso del un usuario de sistema que, según la estructura de directorios, puede ser o *juan* o *pedro*.
+Para continuar probaremos con ambos usuarios y veremos si desde esa máquina si podemos listar comandos con permisos de sudo.
+
+```ruby
+❯ ssh juan@172.17.0.2
+juan@172.17.0.2's password: 
+$ whoami
+juan
 ```
