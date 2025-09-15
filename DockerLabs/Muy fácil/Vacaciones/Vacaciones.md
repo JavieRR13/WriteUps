@@ -232,3 +232,14 @@ juan@172.17.0.2's password:
 $ whoami
 juan
 ```
+
+Una vez dentro de la máquina víctima, vamos a intentar listar todos los privilegios de sudo del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo. 
+```ruby
+$ sudo -l
+Matching Defaults entries for juan on bce9d6585f7e:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User juan may run the following commands on bce9d6585f7e:
+    (ALL) NOPASSWD: /usr/bin/ruby
+```
+Sabiendo que podemos ejecutar Ruby con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/ruby/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
