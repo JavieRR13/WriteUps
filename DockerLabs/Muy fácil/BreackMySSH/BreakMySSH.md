@@ -1,4 +1,4 @@
-# BREAKMYSSH
+# BREAKMYSSH 
 ## INDICACIONES PREVIAS
 * Sistema operativo: Kali Linux
 * Terminal: ZSH Powerlevel10K
