@@ -199,6 +199,7 @@ dylan@127ef1d0b8b9:~$ /usr/bin/env /bin/sh -p
 root
 ```
 🥳CONSEGUIDO, SOMOS ROOT🥳
+____________________________________________________________________________________________
 ### 2. SQLmap
 Primero debemos rellenar el cuestionario con datos aleatorios, esto actualizará la url de la página en el navegador y nos añadirá el subdominio *172.17.0.2/index.php*. Ahora, una vez que sabemos como se llama la página del formulario, nos dirigiremos a la terminal y con la herramienta [SQLmap](https://github.com/sqlmapproject/sqlmap) buscaremos todas las bases de datos que se encuentren en este sistema.
 
