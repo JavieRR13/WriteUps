@@ -110,13 +110,104 @@ Al igual que antes, para que la visualización de toda la información sea más 
   34   │ # Nmap done at Tue Sep 16 12:28:40 2025 -- 1 IP address (1 host up) scanned in 7.76 seconds
 ───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
+Esta máquina tiene dos formas fáciles de resolverse:
+
+### 1. EXPLOTACION FTP
 En el puerto 22 nos encontramos con un servicio *OpenSSH* actualizado a una versión relativamente reciente, lo que indica que no presenta ninguna vulnerabilidad conocida (versiones < 7.7).  Continuaremos con el servicio FTP, el cual pasaremos por la herramienta [SearchSploit](https://github.com/topics/searchsploit) para ver si presenta alguna vulnerabilidad.
 ```ruby
 ❯ searchsploit "vsftpd 3.0.5"
 Exploits: No Results
 Shellcodes: No Results
 ```
-Este servicio tampoco presenta ninguna vulnerabilidad conocida así que procederemos a analizar el servicio HTTP que corre por el puerto 80.
+Este servicio tampoco presenta ninguna vulnerabilidad conocida pero sí que permite el login con usuario *Anónimo*.  Vamos a ver que encontramos.
+
+```ruby
+❯ ftp 172.17.0.2
+Connected to 172.17.0.2.
+220 (vsFTPd 3.0.5)
+Name (172.17.0.2:kali): anonymous
+331 Please specify the password.
+Password: 
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp> ls 
+229 Entering Extended Passive Mode (|||20864|)
+150 Here comes the directory listing.
+-rw-r--r--    1 0        0             667 Jun 18  2024 chat-gonza.txt
+-rw-r--r--    1 0        0             315 Jun 18  2024 pendientes.txt
+226 Directory send OK.
+ftp> mget chat-gonza.txt pendientes.txt
+mget chat-gonza.txt [anpqy?]? 
+229 Entering Extended Passive Mode (|||48381|)
+150 Opening BINARY mode data connection for chat-gonza.txt (667 bytes).
+100% |************************************************************************************************************************************************|   667        0.65 KiB/s    --:-- ETA
+226 Transfer complete.
+667 bytes received in 00:00 (0.65 KiB/s)
+mget pendientes.txt [anpqy?]? 
+229 Entering Extended Passive Mode (|||59834|)
+150 Opening BINARY mode data connection for pendientes.txt (315 bytes).
+100% |************************************************************************************************************************************************|   315        0.30 KiB/s    --:-- ETA
+226 Transfer complete.
+315 bytes received in 00:00 (0.30 KiB/s)
+```
+Podemos observar que el login anónimo ha dado resultado y nos hemos encontrado con dos archivos de texto los cuales, haciendo uso del comando `mget`, nos los hemos traidoa nuestra máquina Kali.
+
+```bash
+❯ cat chat-gonza.txt pendientes.txt
+───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: chat-gonza.txt
+───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ [16:21, 16/6/2024] Gonza: pero en serio es tan guapa esa tal Nágore como dices?
+   2   │ [16:28, 16/6/2024] Russoski: es una auténtica princesa pff, le he hecho hasta un vídeo y todo, lo tengo ya subido y tengo la URL guardada
+   3   │ [16:29, 16/6/2024] Russoski: en mi ordenador en una ruta segura, ahora cuando quedemos te lo muestro si quieres
+   4   │ [21:52, 16/6/2024] Gonza: buah la verdad tenías razón eh, es hermosa esa chica, del 9 no baja
+   5   │ [21:53, 16/6/2024] Gonza: por cierto buen entreno el de hoy en el gym, noto los brazos bastante hinchados, así sí
+   6   │ [22:36, 16/6/2024] Russoski: te lo dije, ya sabes que yo tengo buenos gustos para estas cosas xD, y sí buen training hoy
+───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+───────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: pendientes.txt
+───────┼─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ 1 Comprar el Voucher de la certificación eJPTv2 cuanto antes!
+   2   │ 
+   3   │ 2 Aumentar el precio de mis asesorías online en la Web!
+   4   │ 
+   5   │ 3 Terminar mi laboratorio vulnerable para la plataforma Dockerlabs!
+   6   │ 
+   7   │ 4 Cambiar algunas configuraciones de mi equipo, creo que tengo ciertos
+   8   │   permisos habilitados que no son del todo seguros..
+───────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────```
+```
+En el primer archivo nos encontramos con lo que parece un chat entre dos usuarios de sistema, *Gonza* y *Russoski*.  Por el uso de la primera persona del singular puedo interpretar que estamos tomando el papel de Russoski.  Además, en el segundo archivo se nos esta desvelando que con este usuario de sistema tenemos unos permisos habilitados así que, vamos a probar en el servicio *OpenSSH*.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
